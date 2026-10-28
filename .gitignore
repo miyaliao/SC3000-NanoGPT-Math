@@ -1,0 +1,16 @@
+.venv/
+
+# Python environment
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Model checkpoints
+sft/gpt.pt
+dpo/dpo.pt
+dpo/dpo_epoch*.pt
+
+# Slurm logs
+*.out
+*.err
