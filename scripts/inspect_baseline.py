@@ -59,6 +59,7 @@ def main():
     )
     parser.add_argument("--device", choices=["cpu", "cuda"], default="cpu")
     parser.add_argument("--max-new-tokens", type=int, default=48)
+    parser.add_argument("--prompt", default="79-7=?", help="Math prompt for optional smoke generation")
     args = parser.parse_args()
 
     checkpoint_path = resolve(args.checkpoint)
@@ -120,7 +121,7 @@ def main():
     if args.smoke:
         if args.device == "cuda" and not torch.cuda.is_available():
             parser.error("CUDA unavailable. Run without --smoke on login node, or use a GPU job.")
-        prompt = prompts[0]
+        prompt = args.prompt
         if set(prompt) - set(stoi):
             parser.error("Smoke prompt contains out-of-vocabulary characters")
         model.to(args.device)
