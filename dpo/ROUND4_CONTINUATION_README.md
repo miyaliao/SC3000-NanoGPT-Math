@@ -44,7 +44,7 @@ python scripts/train_round4_matched.py --arm treatment --check-only
 python scripts/train_round4_matched.py --arm replay_only --check-only
 ```
 
-Output: `dpo/data/round4_matched_full/{treatment_pairs.json,replay_only_pairs.json,manifest.json}`.
+Output: `dpo/data/round4_matched_full/{treatment_pairs.json,replay_only_pairs.json,extension_val.json,manifest.json}`. The new 384-example extension validation set (64 each for six multiplicative categories; product 401–999) contains only stable-split validation facts and no treatment/replay training facts.
 Every source/arm file is hashed. Existing output folders are never overwritten. No GPU required for these commands. If the data folder already exists, inspect it instead of deleting or recreating it.
 
 ## Phase 2 — small GPU smoke (one GPU)
@@ -73,7 +73,7 @@ Separate checkpoints/metrics:
 - `dpo/experiments/round4_treatment/dpo_epoch1.pt`, `dpo_epoch2.pt`, `summary.json`
 - `dpo/experiments/round4_replay_only/dpo_epoch1.pt`, `dpo_epoch2.pt`, `summary.json`
 
-Each epoch automatically evaluates **the same** 256 Round3 train-probe examples, 768 in-domain Round3 validation cases and 256 older OOD validation cases. No Round3 final test is evaluated.
+Each epoch automatically evaluates **the same** 256 Round3 train-probe examples, 768 in-domain Round3 validation cases, 256 older OOD validation cases, **and 384 new extended-domain validation questions**. Both arms use the same frozen extension validation set. No Round3 final test is evaluated.
 
 After BOTH jobs finish:
 
@@ -81,7 +81,7 @@ After BOTH jobs finish:
 python scripts/compare_round4_matched.py
 ```
 
-Look first at treatment-minus-replay on the fixed 768 questions, and at its impact on multiplication, `x_over_a`, addition, and the older OOD set. Watch for catastrophic forgetting.
+Look first at treatment-minus-replay on the fixed 768 questions **and 384-product-extension validation set**, and at its impact on multiplication, `x_over_a`, addition, and the older OOD set. Watch for catastrophic forgetting.
 
 ## Interpretation
 
