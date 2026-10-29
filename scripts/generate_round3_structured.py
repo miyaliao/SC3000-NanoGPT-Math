@@ -213,11 +213,11 @@ def sample_rows(pools: dict, profile: str, seed: int):
 
 def verify_records(records: dict, seed: int, vocab: set[str] | None):
     # Called before writing ANY outputs.
-    max_len = 0
     manifest_splits = {}
     seen_fact_keys = {split: set() for split in records}
     seen_prompts = {split: set() for split in records}
     for split, rows in records.items():
+        max_len = 0
         cats, tags = Counter(), Counter()
         for row in rows:
             p, ans, pos, neg = row["prompt"], row["answer"], row["positive"], row["negative"]
