@@ -197,6 +197,8 @@ def main():
     p.add_argument("--completion-weight", type=float, default=0.25)
     p.add_argument("--end-weight", type=float, default=1.0)
     p.add_argument("--out-dir", type=Path, default=DEFAULT_DEST)
+    p.add_argument("--summary-path", type=Path, default=None,
+                   help="Unique summary JSON inside results/ for this experiment")
     p.add_argument("--check-data-only", action="store_true")
     args = p.parse_args()
     if (args.epochs < 1 or args.batch_size < 1 or 256 % args.batch_size
@@ -218,8 +220,16 @@ def main():
     experiment_root = (ROOT/"dpo/experiments").resolve()
     if dest == experiment_root or not dest.is_relative_to(experiment_root) or dest.exists():
         p.error("Specify a NEW output directory below dpo/experiments/ (never overwrite)")
-    if SUMMARY_PATH.exists():
-        p.error(f"Summary exists; refusing to overwrite {SUMMARY_PATH}")
+    if args.summary_path is None:
+        summary_path = SUMMARY_PATH if dest == DEFAULT_DEST.resolve() else ROOT / "results" / f"{dest.name}_summary.json"
+    else:
+        summary_path = args.summary_path if args.summary_path.is_absolute() else ROOT / args.summary_path
+    summary_path = summary_path.resolve()
+    results_root = (ROOT / "results").resolve()
+    if summary_path == results_root or not summary_path.is_relative_to(results_root):
+        p.error("Summary path must be a file below results/")
+    if summary_path.exists():
+        p.error(f"Summary exists; refusing to overwrite {summary_path}")
 
     import torch
     import torch.nn.functional as F
@@ -320,7 +330,7 @@ def main():
         "seen_train_generation":train_gen,"unseen_val_generation":val_gen,
         "note":"Additional termination-loss ablation; teacher-provided target, not TA evaluation. Existing checkpoints unchanged.",
     }
-    save_json(SUMMARY_PATH,result)
+    save_json(summary_path,result)
     print("=== OVERFIT256 TERMINATION-AWARE LOSS COMPLETE ===",flush=True)
     print(f"TRAIN accuracy: {train_score['correct']}/256 = {train_score['accuracy']:.2%}",flush=True)
     print(f"VAL accuracy: {val_score['correct']}/256 = {val_score['accuracy']:.2%}",flush=True)
@@ -329,7 +339,7 @@ def main():
     print(f"Gold end-period top-1 (teacher forced): {after['gold_stop_top1_rate']:.2%}",flush=True)
     print(f"Mean gold end-period P(.): {after['mean_gold_stop_probability']:.4f}",flush=True)
     print(f"Preference wins: {after['pairwise_wins']}/256 = {after['pairwise_win_rate']:.2%}",flush=True)
-    print("Saved:",SUMMARY_PATH,flush=True)
+    print("Saved:",summary_path,flush=True)
     print("Checkpoint:",checkpoint,flush=True)
 
 
