@@ -44,6 +44,11 @@ def check_data(data_dir,arm):
     file=data_dir/f"{arm}_pairs.json"
     if hashfile(file)!=m["file_sha256"][arm]:
         raise RuntimeError(f"Training arm SHA256 mismatch: {file}")
+    extension_val=data_dir/"extension_val.json"
+    if hashfile(extension_val)!=m["file_sha256"]["extension_val"]:
+        raise RuntimeError("Extended-domain validation SHA256 mismatch")
+    if m["extension_val_count"]!=384:
+        raise RuntimeError("Expected fixed 384-question extended validation")
     if not BASE.is_file():
         raise RuntimeError("Missing Round3 initial checkpoint")
     n=m["training_arm_size"]
@@ -144,6 +149,7 @@ def main():
         "train_probe":json.loads((EVAL_ROOT/"train_probe_256.json").read_text(encoding="utf-8")),
         "val":json.loads((EVAL_ROOT/"val.json").read_text(encoding="utf-8")),
         "old_ood":json.loads(OOD.read_text(encoding="utf-8")),
+        "extended_val":json.loads((data_dir/"extension_val.json").read_text(encoding="utf-8")),
     }
     # Do not read or score the sealed Round3 final test JSON!
     epoch_history=[]
