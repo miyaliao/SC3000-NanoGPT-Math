@@ -17,3 +17,6 @@ dpo/dpo_epoch*.pt
 
 # Disposable DPO smoke artifacts
 dpo/smoke_outputs/
+
+# Keep each experimental checkpoint out of Git
+dpo/experiments/**/dpo.pt
