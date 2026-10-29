@@ -22,3 +22,8 @@ dpo/smoke_outputs/
 dpo/experiments/**/dpo.pt
 # Round 1C checkpoint
 dpo/experiments/round1c_incorrect/dpo.pt
+
+# Round4 generated 100k preference datasets (generated locally and submitted separately)
+/dpo/data/round4_matched_*/
+# Avoid accidentally committing large per-epoch experiment checkpoints
+/dpo/experiments/**/dpo_epoch*.pt
