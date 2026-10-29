@@ -94,7 +94,7 @@ def validate_sources():
     }
 
 
-def get_extension_pool(protected):
+def get_extension_pool(protected, split="train"):
     by_kind={k:{} for k in MULTIPLICATIVE}
     for a in range(2,101):
         for b in range(a,101):
@@ -102,7 +102,7 @@ def get_extension_pool(protected):
             for left,right in ((a,b),(b,a)) if a!=b else ((a,b),):
                 for row in product_relations(left,right):
                     key=row["fact_key"]
-                    if key in protected or stable_split(key,SEED)!="train":
+                    if key in protected or stable_split(key,SEED)!=split:
                         continue
                     by_kind[row["category"]].setdefault(row["prompt"],row)
     return by_kind
@@ -151,7 +151,15 @@ def build(profile):
         selected=rng.choices(candidates,k=count)
         treatment_pairs.extend(old[i] for i in selected)
         focus_counts[category]=count
-    extension=get_extension_pool(protected)
+    extension=get_extension_pool(protected, split="train")
+    extension_val_pool=get_extension_pool(protected, split="val")
+    extension_val=[]
+    for category in MULTIPLICATIVE:
+        candidates=list(extension_val_pool[category].values())
+        if len(candidates)<64:
+            raise RuntimeError(f"Not enough independent extended validation examples: {category}")
+        extension_val.extend(rng.sample(candidates,64))
+    rng.shuffle(extension_val)
     extension_rows=[]
     extension_stats={}
     for category,count in extend_quota.items():
@@ -220,7 +228,16 @@ def build(profile):
       "evaluation":"Existing Round3 768 Val + previous Round1C 256 OOD; never Round3 final Test",
       "note":"All 70% shared old examples are identical between arms. Treatment additionally reweights hard old train facts and adds product 401..999 facts; control replays older training examples only.",
     }
-    return control_pairs,treatment_pairs,info
+    info["extension_val_count"]=len(extension_val)
+    info["extension_val_unique_math_facts"]=len({r["fact_key"] for r in extension_val})
+    if {r["fact_key"] for r in extension_rows} & {r["fact_key"] for r in extension_val}:
+        raise RuntimeError("Extended validation intersects training facts")
+    for row in extension_val:
+        if stable_split(row["fact_key"],SEED)!="val" or row["fact_key"] in protected:
+            raise RuntimeError("Invalid extended validation assignment")
+        if set(row["positive"]+row["negative"])-vocab:
+            raise RuntimeError("Invalid extended validation vocabulary")
+    return control_pairs,treatment_pairs,extension_val,info
 
 
 def write_new(path,data):
@@ -238,7 +255,7 @@ def main():
     a=p.parse_args()
     out=(a.out_dir if a.out_dir else ROOT/f"dpo/data/round4_matched_{a.profile}").resolve()
     if out.exists() and not a.verify_only:refuse_existing(out)
-    control,treatment,info=build(a.profile)
+    control,treatment,extension_val,info=build(a.profile)
     print("=== ROUND 4 MATCHED DATA CHECK ===")
     print(f"Replay-only={len(control)}, Treatment={len(treatment)}; "
           f"shared_old={info['replay_shared_count']}, "
@@ -254,6 +271,9 @@ def main():
     hashes={}
     hashes["replay_only"]=write_new(out/"replay_only_pairs.json",control)
     hashes["treatment"]=write_new(out/"treatment_pairs.json",treatment)
+    hashes["extension_val"]=write_new(out/"extension_val.json",[
+        {"prompt":r["prompt"],"answer":r["answer"],"category":r["category"],
+         "fact_key":list(r["fact_key"])} for r in extension_val])
     info["file_sha256"]=hashes
     write_new(out/"manifest.json",info)
     print("PASS: no protected validation/test facts entered the new training data")
