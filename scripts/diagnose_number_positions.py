@@ -85,6 +85,8 @@ def summarize_token_rows(items: list[dict]) -> dict:
         "mean_gold_probability": statistics.mean(x["gold_probability"] for x in items),
         "mean_gold_logprob": statistics.mean(x["gold_logprob"] for x in items),
         "mean_gold_rank": statistics.mean(x["gold_rank"] for x in items),
+        "mean_early_period_probability": statistics.mean(
+            x["early_period_probability"] for x in items),
     }
 
 
@@ -183,6 +185,8 @@ def score_split(model, records: list[dict], stoi: dict, device: str,
                 gold_id = stoi[ch]
                 l = logits[b, char_pos - 1]  # position i-1 predicts character i
                 lp = float(logprobs[b, char_pos - 1, gold_id].item())
+                early_period_probability = math.exp(
+                    float(logprobs[b, char_pos - 1, dot_id].item()))
                 rank = 1 + int((l > l[gold_id]).sum().item())
                 pos = location_of_answer_char(answer, j)
                 info = {
@@ -194,6 +198,7 @@ def score_split(model, records: list[dict], stoi: dict, device: str,
                     "digit_from_left": pos["digit_from_left"],
                     "gold_probability": math.exp(lp),
                     "gold_logprob": lp,
+                    "early_period_probability": early_period_probability,
                     "gold_rank": rank,
                     "top1": rank == 1,
                     "greedy_top_character": None,  # optional token text not needed for summary
@@ -338,7 +343,8 @@ def main():
             value = summary["by_place_from_right"].get(place)
             if value:
                 print(f"{place:10} {value['top1_count']:3}/{value['n']:3} "
-                      f"= {value['top1_rate']:.2%}, mean P(gold)={value['mean_gold_probability']:.3f}")
+                      f"= {value['top1_rate']:.2%}, mean P(gold)={value['mean_gold_probability']:.3f}, "
+                      f"mean early P(.)={value['mean_early_period_probability']:.3f}")
         t = summary["two_digit_only"]
         print(f"Two-digit answers: N={t['n']} | tens={t['tens']['top1_rate']:.2%}"
               f" | ones={t['ones']['top1_rate']:.2%}")
