@@ -116,8 +116,13 @@ def main():
     assert len(metadata)==100000 and len(val)==768 and len(probe)==256
     if a.smoke: pairs=all_pairs[:64];a.epochs=1;a.batch_size=16
     else: pairs=all_pairs
-    if len(pairs)%a.batch_size:
-        p.error("Training row count must be divisible by batch size")
+    if len(pairs) < a.batch_size:
+        p.error("Training rows must be at least one full batch")
+    remainder = len(pairs) % a.batch_size
+    if remainder:
+        print(f"NOTE: {remainder} rows in the final incomplete batch will be skipped "
+              f"per epoch by the instructor's get_batches(); "
+              f"{len(pairs)//a.batch_size} full batches/epoch.", flush=True)
     print(f"PASS dataset SHA256 and lengths: total={len(all_pairs)} "
           f"selected={len(pairs)}, val={len(val)}",flush=True)
     if a.check_only:return
