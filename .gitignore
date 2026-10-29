@@ -14,3 +14,6 @@ dpo/dpo_epoch*.pt
 # Slurm logs
 *.out
 *.err
+
+# Disposable DPO smoke artifacts
+dpo/smoke_outputs/
