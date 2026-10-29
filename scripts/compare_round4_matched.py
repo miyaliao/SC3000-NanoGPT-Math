@@ -37,7 +37,7 @@ def main():
     print(f"\nRound3 baseline    val: {base['correct']}/{base['n']} = {base['accuracy']:.2%}")
     for name,model in (("Replay-only",control),("Treatment",treatment)):
         for e in model["epoch_history"]:
-            for split in ("train_probe","val","old_ood"):
+            for split in ("train_probe","val","old_ood","extended_val"):
                 print(line(name,f"Epoch{e['epoch']}",split,e["evaluations"][split]))
     print("\n=== Fixed in-domain validation: per-category comparison ===")
     b=base["by_category"]
@@ -52,6 +52,10 @@ def main():
     rc=control["epoch_history"][-1]["evaluations"]["val"]["correct"]
     tc=treatment["epoch_history"][-1]["evaluations"]["val"]["correct"]
     print(f"\nVAL net gain vs replay: {tc-rc:+d}/768 ({(tc-rc)/768:+.2%})")
+    extc=control["epoch_history"][-1]["evaluations"]["extended_val"]
+    extt=treatment["epoch_history"][-1]["evaluations"]["extended_val"]
+    print(f"EXTENDED VAL net gain vs replay: {extt['correct']-extc['correct']:+d}/384 "
+          f"({extt['accuracy']-extc['accuracy']:+.2%})")
     print(f"VAL net gain vs Round3 baseline: {tc-bc:+d}/768 ({(tc-bc)/768:+.2%})")
     print("Note: additional training vs data-targeting are separable only "
           "through the replay-only control. Do not interpret test-set results.")
