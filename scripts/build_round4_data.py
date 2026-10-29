@@ -174,8 +174,8 @@ def build(profile):
     rng.shuffle(treatment_pairs)
     if len(control_pairs)!=len(treatment_pairs):
         raise AssertionError("Control and treatment length mismatch")
-    if len(control_pairs)%64!=0:
-        raise AssertionError("Designed both datasets to be divisible by batch 64")
+    # Preserve the instructor's get_batches() behavior: any final <64 rows are
+    # skipped after shuffling. Both arms have identical count and skipped rows.
     # Audit ALL newly created samples; neither arm can introduce fact leakage.
     vocab_path=ROOT/"sft/meta.pkl"
     with vocab_path.open("rb") as f:vocab=set(pickle.load(f)["stoi"])
@@ -213,6 +213,8 @@ def build(profile):
       "new_extension_by_category":extension_stats,
       "max_sequence_with_padding":max_len,
       "training_arm_size":len(control_pairs),
+      "full_batches_per_epoch_batch64":len(control_pairs)//64,
+      "discarded_incomplete_batch_per_epoch":len(control_pairs)%64,
       "training_rows_not_unique_prompts":True,
       "training_plan":"Round3 checkpoint; original Course Loss; 2 epochs, batch 64, lr=2e-5; replay-only control",
       "evaluation":"Existing Round3 768 Val + previous Round1C 256 OOD; never Round3 final Test",
