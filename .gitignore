@@ -20,3 +20,5 @@ dpo/smoke_outputs/
 
 # Keep each experimental checkpoint out of Git
 dpo/experiments/**/dpo.pt
+# Round 1C checkpoint
+dpo/experiments/round1c_incorrect/dpo.pt
