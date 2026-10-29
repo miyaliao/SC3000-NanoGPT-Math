@@ -45,10 +45,13 @@ squeue -u "$USER"
 tail -n 30 round1_<JOB_ID>.out
 ```
 
-This executes the actual Notebook Step 2–7 cells with 5 epochs, batch size 64,
-320 batches per epoch, and the existing teacher-recommended preference loss.
-Outputs: `dpo/dpo.pt` and `results/round1_training_summary.json`. The runner
-refuses to overwrite an existing formal checkpoint without `--overwrite`.
+This job first evaluates the frozen baseline on the first 256 validation questions,
+then executes the actual Notebook Step 2–7 cells with 5 epochs, batch size 64,
+320 batches per epoch and the existing teacher-recommended preference loss,
+then scores the Round 1 checkpoint on **the same** 256 questions. Outputs:
+`dpo/dpo.pt`, `results/round1_training_summary.json`,
+`results/round1_val_baseline_256.jsonl` and `results/round1_val_dpo_256.jsonl`.
+The runner refuses to overwrite an existing formal checkpoint without `--overwrite`.
 
 ## Evaluate Round 1 using exactly the same validation questions
 
