@@ -27,15 +27,15 @@ This is DIRECTLY based on the paper's addition data code, whereas our division/e
 
 ### Seen and Unseen math facts, transparently reported
 
-Each of the four subskills contains 20 **unique canonical math facts**, and the benchmark contains exactly **400 unique math facts** across categories and commuted/inverse prompts. Select as close as possible to 10 Seen and 10 Unseen PER SUBSKILL **when feasible**, otherwise fill the fixed 20 from available source candidates and report the exact counts. Commuted arithmetic questions (e.g. `17+19=?` and `19+17=?`) count as **the same mathematical fact** and cannot both enter the 400. "Seen" means the mathematical fact appeared in ANY of the actual Round3, Round4 Treatment or Round5-A original training sources used to reach Round5-A/Round7 Replay; "Unseen" means not in that historical union. Labels are not guessed from surface prompt spelling.
+Every subskill contains 20 examples with distinct canonical facts, and every operation's 80 questions use 80 distinct facts. All **400 prompt strings are unique**. Some canonical math facts can recur ACROSS different operation groups (e.g. a known product also tested as a division or equation) because the elementary number range is finite. The manifest reports the **actual total unique math-fact count and cross-operation reuse**, and groups must not be mistaken for 400 statistically independent facts. Select as close as possible to 10 Seen and 10 Unseen PER SUBSKILL **when feasible**, otherwise fill the fixed 20 from available source candidates and report the exact counts. Commuted arithmetic questions (e.g. `17+19=?` and `19+17=?`) count as **the same mathematical fact** and cannot both enter the 400. "Seen" means the mathematical fact appeared in ANY of the actual Round3, Round4 Treatment or Round5-A original training sources used to reach Round5-A/Round7 Replay; "Unseen" means not in that historical union. Labels are not guessed from surface prompt spelling.
 
 **Isolation protections:**
 1. No mathematical fact is shared with frozen Round3 Val768, Old OOD256, Extended384, saved public prior-year Blind61/41 or instructor RESERVED samples.
-2. All 400 mathematical facts must satisfy the original `stable_split(fact_key,42)=='train'` partition. This keeps them away from the **original sealed Round3 independent TEST partition WITHOUT OPENING its contents**; even novel unseen questions are generated only from *train-partition potential facts*, then withheld from any new train.
-3. Once frozen, ALL 400 canonical facts (even historically Seen ones) are considered **protected** and future Round8 mining / numerical variants may not train on them. `scripts/mine_round8_train_hard_negatives.py` now REQUIRES the frozen benchmark to exist and verifies its SHA before mining.
+2. All selected mathematical facts must satisfy the original `stable_split(fact_key,42)=='train'` partition. This keeps them away from the **original sealed Round3 independent TEST partition WITHOUT OPENING its contents**; even novel unseen questions are generated only from *train-partition potential facts*, then withheld from any new train.
+3. Once frozen, ALL mathematical facts represented by the 400 prompts (even historically Seen ones) are considered **protected** and future Round8 mining / numerical variants may not train on them. `scripts/mine_round8_train_hard_negatives.py` now REQUIRES the frozen benchmark to exist and verifies its SHA before mining.
 4. The benchmark is a **development evaluation suite**, since it was designed using previous skill-level error analysis. It is not an independent hidden grader, and the sealed Round3 final Test remains untouched.
 5. The historical `Seen` subgroup is **not a generalization test**, even though the benchmark is now frozen against future training. Report Seen and Unseen accuracy separately, plus every category and 20-row subskill.
-6. If any bucket has fewer than 20 eligible distinct facts after all protections, the generator FAILS rather than silently changing bucket sizes or leaking other splits; inspect the printed shortage and revise the written specification deliberately **before** committing the frozen set.
+6. If any bucket has fewer than 20 eligible distinct facts within its operation group after all protections, the generator FAILS rather than silently changing bucket sizes or leaking other splits; inspect the printed shortage and revise the written specification deliberately **before** committing the frozen set.
 
 ## CPU: create benchmark exactly ONCE
 
@@ -50,7 +50,7 @@ python scripts/build_teacher_style_400.py --check-frozen
 ```
 
 All these commands are **CPU-only**. Freezing writes:
-- `dpo/benchmarks/teacher_style_400_v1/questions.json` — 400 labeled prompt/gold/category/subskill/fact-key/Seen-Unseen records;
+- `dpo/benchmarks/teacher_style_400_v1/questions.json` — 400 DISTINCT labeled prompt/gold/category/subskill/fact-key/Seen-Unseen records;
 - `dpo/benchmarks/teacher_style_400_v1/manifest.json` — frozen stratification counts, SHA256 of all source data, question-file SHA256, split/protection rules, seed and paper attribution.
 
 The generator refuses to overwrite existing output. Check the counts in both console output and manifest. If they look right, immediately commit **the two small frozen files**:
