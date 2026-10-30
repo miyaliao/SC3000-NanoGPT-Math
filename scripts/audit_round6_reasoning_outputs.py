@@ -67,10 +67,24 @@ def metric(rows):
         m=REASON.fullmatch(completion)
         if not m:raise AssertionError("Parser/reason expression mismatch")
         a,tens,p1,b,ones,p2,q1,q2,total,n=(int(x) for x in m.groups())
+        # Stagewise arithmetic diagnostics. These measure actual numerical
+        # steps, not just a plausible-looking reasoning template.
+        valid_tens_product=(a*tens==p1)
+        valid_ones_product=(b*ones==p2)
+        copied_partials=(p1==q1 and p2==q2)
+        valid_addition=(q1+q2==total)
+        final_matches_written_total=(total==n)
+        if valid_tens_product:totals["tens_product_correct"]+=1
+        if valid_ones_product:totals["ones_product_correct"]+=1
+        if copied_partials:totals["partial_results_copied_correctly"]+=1
+        if valid_addition:totals["addition_arithmetic_correct"]+=1
+        if final_matches_written_total:totals["final_matches_written_sum"]+=1
+        if valid_tens_product and valid_ones_product:
+            totals["both_partial_products_correct"]+=1
         internally_valid=(
           a==b and tens>=10 and tens%10==0 and ones>0
-          and a*tens==p1 and a*ones==p2 and p1==q1 and p2==q2
-          and p1+p2==total==n
+          and valid_tens_product and valid_ones_product and copied_partials
+          and valid_addition and final_matches_written_total
         )
         if internally_valid:totals["internally_valid_steps"]+=1
         elif len(samples["internally_wrong_steps"])<8:
@@ -117,6 +131,17 @@ def run(epoch):
           f"final gold number correct={overall['reason_final_number_correct']}")
     print(f"Reasoning output in DIRECT 128={overall['direct_reason_before_answer']}; "
           f"elsewhere={overall['non_direct_reason_before_answer']}")
+    print("STEPWISE ARITHMETIC AMONG COMPLETE PRE-ANSWER OUTPUTS "
+          f"(N={overall['reason_before_answer']}):")
+    for label,key in (
+        ("tens partial product","tens_product_correct"),
+        ("ones partial product","ones_product_correct"),
+        ("both partial products","both_partial_products_correct"),
+        ("copied partials into sum","partial_results_copied_correctly"),
+        ("printed sum arithmetic","addition_arithmetic_correct"),
+        ("final number equals printed sum","final_matches_written_sum"),
+    ):
+        print(f"  {label:35} {overall[key]}/{overall['reason_before_answer']}")
     print("\nPer category: N, reasoning pattern, valid steps, aligned prompt, "
           "fully valid question-proof, final correct")
     for category,rows in sorted(categories.items()):
@@ -126,7 +151,10 @@ def run(epoch):
               f"valid_steps={counts['internally_valid_steps']:3} "
               f"aligned={counts['factor_alignment']:3} "
               f"fully_valid={counts['fully_valid_reason_for_question']:3} "
-              f"correct={counts['final_correct']:3}")
+              f"correct={counts['final_correct']:3} "
+              f"tens={counts['tens_product_correct']:3} "
+              f"ones={counts['ones_product_correct']:3} "
+              f"sum={counts['addition_arithmetic_correct']:3}")
     for label,rows in examples.items():
         if rows:
             print(f"\n{label} (up to 8 examples):")
