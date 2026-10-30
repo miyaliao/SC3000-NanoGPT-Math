@@ -1,0 +1,744 @@
+{
+  "meta": {
+    "reference_repository": "https://github.com/JamesRobertJohns/3000",
+    "source_path": "src/dpo/dpo.ipynb",
+    "reference_notebook_sha": "2a00af58521a25a9089a6a782e87abf2015c3c4c",
+    "sourced": "Frozen prompt list and printed model outputs in the published Jupyter notebook (cells 44 and 61).",
+    "reference_decoding": "stochastic model.generate temperature=0.8 top_k=200 max_new_tokens=200; published one saved outcome per prompt",
+    "scope": "61 pre-extra-finetuning blind questions, 41 post-extra-finetuning blind questions",
+    "scoring": "first The answer is <integer> number from printed reference output; independently recomputed arithmetic gold from question",
+    "warning": "The two published sets were run on different reference checkpoints. Their training-data fact disjointness not proven. Do not treat as a single 102-sample IID accuracy or as an official TA score."
+  },
+  "groups": {
+    "blind61": {
+      "source_cell_index": 44,
+      "published_n": 61,
+      "reference_correct": 52,
+      "reference_accuracy": 0.8524590163934426,
+      "records": [
+        {
+          "prompt": "88+7=?",
+          "answer": "95",
+          "reference_prediction": "95",
+          "reference_correct": true,
+          "reference_generated": "88+7=? The answer is 95 because 88+7 equals 95."
+        },
+        {
+          "prompt": "x-18=21,x=?",
+          "answer": "39",
+          "reference_prediction": "39",
+          "reference_correct": true,
+          "reference_generated": "x-18=21,x=? The answer is 39 because 21+18 equals 39."
+        },
+        {
+          "prompt": "x/10=6,x=?",
+          "answer": "60",
+          "reference_prediction": "60",
+          "reference_correct": true,
+          "reference_generated": "x/10=6,x=? The answer is 60 because 6*10 equals 60."
+        },
+        {
+          "prompt": "54/1=?",
+          "answer": "54",
+          "reference_prediction": "54",
+          "reference_correct": true,
+          "reference_generated": "54/1=? The answer is 54 because 54/1 equals 54."
+        },
+        {
+          "prompt": "24+48=?",
+          "answer": "72",
+          "reference_prediction": "72",
+          "reference_correct": true,
+          "reference_generated": "24+48=? The answer is 72 because 24+48 equals 72."
+        },
+        {
+          "prompt": "11+23=?",
+          "answer": "34",
+          "reference_prediction": "34",
+          "reference_correct": true,
+          "reference_generated": "11+23=? The answer is 34 because 11+23 equals 34."
+        },
+        {
+          "prompt": "56*34=?",
+          "answer": "1904",
+          "reference_prediction": "162",
+          "reference_correct": false,
+          "reference_generated": "56*34=? The answer is 162 because 56*34 equals 162."
+        },
+        {
+          "prompt": "67*23=?",
+          "answer": "1541",
+          "reference_prediction": "1",
+          "reference_correct": false,
+          "reference_generated": "67*23=? The answer is 1use 67 because 67*23 equals 1."
+        },
+        {
+          "prompt": "89*11=?",
+          "answer": "979",
+          "reference_prediction": "179",
+          "reference_correct": false,
+          "reference_generated": "89*11=? The answer is 179 because 89*11 equals 179."
+        },
+        {
+          "prompt": "90*12=?",
+          "answer": "1080",
+          "reference_prediction": "960",
+          "reference_correct": false,
+          "reference_generated": "90*12=? The answer is 960 because 90*12 equals 960."
+        },
+        {
+          "prompt": "33*44=?",
+          "answer": "1452",
+          "reference_prediction": "102",
+          "reference_correct": false,
+          "reference_generated": "33*44=? The answer is 102 because 33*44 equals 102."
+        },
+        {
+          "prompt": "x*12=156,x=?",
+          "answer": "13",
+          "reference_prediction": "13",
+          "reference_correct": true,
+          "reference_generated": "x*12=156,x=? The answer is 13 because 156/12 equals 13."
+        },
+        {
+          "prompt": "15*x=300,x=?",
+          "answer": "20",
+          "reference_prediction": "20",
+          "reference_correct": true,
+          "reference_generated": "15*x=300,x=? The answer is 20 because 300/15 equals 20."
+        },
+        {
+          "prompt": "x*25=500,x=?",
+          "answer": "20",
+          "reference_prediction": "20",
+          "reference_correct": true,
+          "reference_generated": "x*25=500,x=? The answer is 20 because 500/25 equals 20."
+        },
+        {
+          "prompt": "40*x=800,x=?",
+          "answer": "20",
+          "reference_prediction": "20",
+          "reference_correct": true,
+          "reference_generated": "40*x=800,x=? The answer is 20 because 800/40 equals 20."
+        },
+        {
+          "prompt": "x*45=2250,x=?",
+          "answer": "50",
+          "reference_prediction": "5",
+          "reference_correct": false,
+          "reference_generated": "x*45=2250,x=? The answer is 5 because 220/45 equals 55."
+        },
+        {
+          "prompt": "84/12=?",
+          "answer": "7",
+          "reference_prediction": "7",
+          "reference_correct": true,
+          "reference_generated": "84/12=? The answer is 7 because 84/12 equals 7."
+        },
+        {
+          "prompt": "96/24=?",
+          "answer": "4",
+          "reference_prediction": "4",
+          "reference_correct": true,
+          "reference_generated": "96/24=? The answer is 4 because 96/24 equals 4."
+        },
+        {
+          "prompt": "72/18=?",
+          "answer": "4",
+          "reference_prediction": "4",
+          "reference_correct": true,
+          "reference_generated": "72/18=? The answer is 4 because 72/18 equals 4."
+        },
+        {
+          "prompt": "99/11=?",
+          "answer": "9",
+          "reference_prediction": "9",
+          "reference_correct": true,
+          "reference_generated": "99/11=? The answer is 9 because 99/11 equals 9."
+        },
+        {
+          "prompt": "88/22=?",
+          "answer": "4",
+          "reference_prediction": "4",
+          "reference_correct": true,
+          "reference_generated": "88/22=? The answer is 4 because 88/22 equals 4."
+        },
+        {
+          "prompt": "60/15=?",
+          "answer": "4",
+          "reference_prediction": "4",
+          "reference_correct": true,
+          "reference_generated": "60/15=? The answer is 4 because 60/15 equals 4."
+        },
+        {
+          "prompt": "48/16=?",
+          "answer": "3",
+          "reference_prediction": "3",
+          "reference_correct": true,
+          "reference_generated": "48/16=? The answer is 3 because 48/16 equals 3."
+        },
+        {
+          "prompt": "81/27=?",
+          "answer": "3",
+          "reference_prediction": "3",
+          "reference_correct": true,
+          "reference_generated": "81/27=? The answer is 3 because 81/27 equals 3."
+        },
+        {
+          "prompt": "64/16=?",
+          "answer": "4",
+          "reference_prediction": "4",
+          "reference_correct": true,
+          "reference_generated": "64/16=? The answer is 4 because 64/16 equals 4."
+        },
+        {
+          "prompt": "90/30=?",
+          "answer": "3",
+          "reference_prediction": "3",
+          "reference_correct": true,
+          "reference_generated": "90/30=? The answer is 3 because 90/30 equals 3."
+        },
+        {
+          "prompt": "x/12=7,x=?",
+          "answer": "84",
+          "reference_prediction": "84",
+          "reference_correct": true,
+          "reference_generated": "x/12=7,x=? The answer is 84 because 7*12 equals 84."
+        },
+        {
+          "prompt": "84/x=12,x=?",
+          "answer": "7",
+          "reference_prediction": "7",
+          "reference_correct": true,
+          "reference_generated": "84/x=12,x=? The answer is 7 because 84/12 equals 7."
+        },
+        {
+          "prompt": "x/15=4,x=?",
+          "answer": "60",
+          "reference_prediction": "60",
+          "reference_correct": true,
+          "reference_generated": "x/15=4,x=? The answer is 60 because 4*15 equals 60."
+        },
+        {
+          "prompt": "75/x=15,x=?",
+          "answer": "5",
+          "reference_prediction": "5",
+          "reference_correct": true,
+          "reference_generated": "75/x=15,x=? The answer is 5 because 75/15 equals 5."
+        },
+        {
+          "prompt": "x/25=9,x=?",
+          "answer": "225",
+          "reference_prediction": "34",
+          "reference_correct": false,
+          "reference_generated": "x/25=9,x=? The answer is 34 because 9*25 equals 34."
+        },
+        {
+          "prompt": "12+34=?",
+          "answer": "46",
+          "reference_prediction": "46",
+          "reference_correct": true,
+          "reference_generated": "12+34=? The answer is 46 because 12+34 equals 46."
+        },
+        {
+          "prompt": "23+45=?",
+          "answer": "68",
+          "reference_prediction": "68",
+          "reference_correct": true,
+          "reference_generated": "23+45=? The answer is 68 because 23+45 equals 68."
+        },
+        {
+          "prompt": "56+78=?",
+          "answer": "134",
+          "reference_prediction": "134",
+          "reference_correct": true,
+          "reference_generated": "56+78=? The answer is 134 because 56+78 equals 134."
+        },
+        {
+          "prompt": "11+22=?",
+          "answer": "33",
+          "reference_prediction": "33",
+          "reference_correct": true,
+          "reference_generated": "11+22=? The answer is 33 because 11+22 equals 33."
+        },
+        {
+          "prompt": "99+1=?",
+          "answer": "100",
+          "reference_prediction": "90",
+          "reference_correct": false,
+          "reference_generated": "99+1=? The answer is 90 because 99+1 equals 90."
+        },
+        {
+          "prompt": "45+54=?",
+          "answer": "99",
+          "reference_prediction": "99",
+          "reference_correct": true,
+          "reference_generated": "45+54=? The answer is 99 because 45+54 equals 99."
+        },
+        {
+          "prompt": "67+32=?",
+          "answer": "99",
+          "reference_prediction": "99",
+          "reference_correct": true,
+          "reference_generated": "67+32=? The answer is 99 because 67+32 equals 99."
+        },
+        {
+          "prompt": "89+10=?",
+          "answer": "99",
+          "reference_prediction": "99",
+          "reference_correct": true,
+          "reference_generated": "89+10=? The answer is 99 because 89+10 equals 99."
+        },
+        {
+          "prompt": "74+25=?",
+          "answer": "99",
+          "reference_prediction": "99",
+          "reference_correct": true,
+          "reference_generated": "74+25=? The answer is 99 because 74+25 equals 99."
+        },
+        {
+          "prompt": "33+66=?",
+          "answer": "99",
+          "reference_prediction": "99",
+          "reference_correct": true,
+          "reference_generated": "33+66=? The answer is 99 because 33+66 equals 99."
+        },
+        {
+          "prompt": "x+45=100,x=?",
+          "answer": "55",
+          "reference_prediction": "55",
+          "reference_correct": true,
+          "reference_generated": "x+45=100,x=? The answer is 55 because 100-45 equals 55."
+        },
+        {
+          "prompt": "23+x=80,x=?",
+          "answer": "57",
+          "reference_prediction": "57",
+          "reference_correct": true,
+          "reference_generated": "23+x=80,x=? The answer is 57 because 80-23 equals 57."
+        },
+        {
+          "prompt": "x+56=78,x=?",
+          "answer": "22",
+          "reference_prediction": "22",
+          "reference_correct": true,
+          "reference_generated": "x+56=78,x=? The answer is 22 because 78-56 equals 22."
+        },
+        {
+          "prompt": "x+90=150,x=?",
+          "answer": "60",
+          "reference_prediction": "50",
+          "reference_correct": false,
+          "reference_generated": "x+90=150,x=? The answer is 50 because 150-90 equals 50."
+        },
+        {
+          "prompt": "40+x=60,x=?",
+          "answer": "20",
+          "reference_prediction": "20",
+          "reference_correct": true,
+          "reference_generated": "40+x=60,x=? The answer is 20 because 60-40 equals 20."
+        },
+        {
+          "prompt": "45-23=?",
+          "answer": "22",
+          "reference_prediction": "22",
+          "reference_correct": true,
+          "reference_generated": "45-23=? The answer is 22 because 45-23 equals 22."
+        },
+        {
+          "prompt": "67-45=?",
+          "answer": "22",
+          "reference_prediction": "22",
+          "reference_correct": true,
+          "reference_generated": "67-45=? The answer is 22 because 67-45 equals 22."
+        },
+        {
+          "prompt": "90-12=?",
+          "answer": "78",
+          "reference_prediction": "78",
+          "reference_correct": true,
+          "reference_generated": "90-12=? The answer is 78 because 90-12 equals 78."
+        },
+        {
+          "prompt": "88-44=?",
+          "answer": "44",
+          "reference_prediction": "44",
+          "reference_correct": true,
+          "reference_generated": "88-44=? The answer is 44 because 88-44 equals 44."
+        },
+        {
+          "prompt": "99-11=?",
+          "answer": "88",
+          "reference_prediction": "88",
+          "reference_correct": true,
+          "reference_generated": "99-11=? The answer is 88 because 99-11 equals 88."
+        },
+        {
+          "prompt": "72-36=?",
+          "answer": "36",
+          "reference_prediction": "36",
+          "reference_correct": true,
+          "reference_generated": "72-36=? The answer is 36 because 72-36 equals 36."
+        },
+        {
+          "prompt": "84-48=?",
+          "answer": "36",
+          "reference_prediction": "36",
+          "reference_correct": true,
+          "reference_generated": "84-48=? The answer is 36 because 84-48 equals 36."
+        },
+        {
+          "prompt": "50-25=?",
+          "answer": "25",
+          "reference_prediction": "25",
+          "reference_correct": true,
+          "reference_generated": "50-25=? The answer is 25 because 50-25 equals 25."
+        },
+        {
+          "prompt": "63-37=?",
+          "answer": "26",
+          "reference_prediction": "26",
+          "reference_correct": true,
+          "reference_generated": "63-37=? The answer is 26 because 63-37 equals 26."
+        },
+        {
+          "prompt": "81-19=?",
+          "answer": "62",
+          "reference_prediction": "62",
+          "reference_correct": true,
+          "reference_generated": "81-19=? The answer is 62 because 81-19 equals 62."
+        },
+        {
+          "prompt": "x-25=25,x=?",
+          "answer": "50",
+          "reference_prediction": "50",
+          "reference_correct": true,
+          "reference_generated": "x-25=25,x=? The answer is 50 because 25+25 equals 50."
+        },
+        {
+          "prompt": "75-x=25,x=?",
+          "answer": "50",
+          "reference_prediction": "50",
+          "reference_correct": true,
+          "reference_generated": "75-x=25,x=? The answer is 50 because 75-25 equals 50."
+        },
+        {
+          "prompt": "x-50=30,x=?",
+          "answer": "80",
+          "reference_prediction": "80",
+          "reference_correct": true,
+          "reference_generated": "x-50=30,x=? The answer is 80 because 30+50 equals 80."
+        },
+        {
+          "prompt": "x-33=11,x=?",
+          "answer": "44",
+          "reference_prediction": "44",
+          "reference_correct": true,
+          "reference_generated": "x-33=11,x=? The answer is 44 because 11+33 equals 44."
+        },
+        {
+          "prompt": "90-x=10,x=?",
+          "answer": "80",
+          "reference_prediction": "80",
+          "reference_correct": true,
+          "reference_generated": "90-x=10,x=? The answer is 80 because 90-10 equals 80."
+        }
+      ]
+    },
+    "blind41": {
+      "source_cell_index": 61,
+      "published_n": 41,
+      "reference_correct": 39,
+      "reference_accuracy": 0.9512195121951219,
+      "records": [
+        {
+          "prompt": "17+19=?",
+          "answer": "36",
+          "reference_prediction": "36",
+          "reference_correct": true,
+          "reference_generated": "17+19=? The answer is 36 because 17+19 equals 36."
+        },
+        {
+          "prompt": "45+27=?",
+          "answer": "72",
+          "reference_prediction": "72",
+          "reference_correct": true,
+          "reference_generated": "45+27=? The answer is 72 because 45+27 equals 72."
+        },
+        {
+          "prompt": "63+18=?",
+          "answer": "81",
+          "reference_prediction": "81",
+          "reference_correct": true,
+          "reference_generated": "63+18=? The answer is 81 because 63+18 equals 81."
+        },
+        {
+          "prompt": "29+47=?",
+          "answer": "76",
+          "reference_prediction": "76",
+          "reference_correct": true,
+          "reference_generated": "29+47=? The answer is 76 because 29+47 equals 76."
+        },
+        {
+          "prompt": "33+66=?",
+          "answer": "99",
+          "reference_prediction": "99",
+          "reference_correct": true,
+          "reference_generated": "33+66=? The answer is 99 because 33+66 equals 99."
+        },
+        {
+          "prompt": "56+42=?",
+          "answer": "98",
+          "reference_prediction": "98",
+          "reference_correct": true,
+          "reference_generated": "56+42=? The answer is 98 because 56+42 equals 98."
+        },
+        {
+          "prompt": "78+11=?",
+          "answer": "89",
+          "reference_prediction": "89",
+          "reference_correct": true,
+          "reference_generated": "78+11=? The answer is 89 because 78+11 equals 89."
+        },
+        {
+          "prompt": "67+25=?",
+          "answer": "92",
+          "reference_prediction": "92",
+          "reference_correct": true,
+          "reference_generated": "67+25=? The answer is 92 because 67+25 equals 92."
+        },
+        {
+          "prompt": "92-38=?",
+          "answer": "54",
+          "reference_prediction": "54",
+          "reference_correct": true,
+          "reference_generated": "92-38=? The answer is 54 because 92-38 equals 54."
+        },
+        {
+          "prompt": "63-28=?",
+          "answer": "35",
+          "reference_prediction": "35",
+          "reference_correct": true,
+          "reference_generated": "63-28=? The answer is 35 because 63-28 equals 35."
+        },
+        {
+          "prompt": "99-87=?",
+          "answer": "12",
+          "reference_prediction": "12",
+          "reference_correct": true,
+          "reference_generated": "99-87=? The answer is 12 because 99-87 equals 12."
+        },
+        {
+          "prompt": "81-45=?",
+          "answer": "36",
+          "reference_prediction": "36",
+          "reference_correct": true,
+          "reference_generated": "81-45=? The answer is 36 because 81-45 equals 36."
+        },
+        {
+          "prompt": "72-39=?",
+          "answer": "33",
+          "reference_prediction": "33",
+          "reference_correct": true,
+          "reference_generated": "72-39=? The answer is 33 because 72-39 equals 33."
+        },
+        {
+          "prompt": "70-12=?",
+          "answer": "58",
+          "reference_prediction": "58",
+          "reference_correct": true,
+          "reference_generated": "70-12=? The answer is 58 because 70-12 equals 58."
+        },
+        {
+          "prompt": "84-56=?",
+          "answer": "28",
+          "reference_prediction": "28",
+          "reference_correct": true,
+          "reference_generated": "84-56=? The answer is 28 because 84-56 equals 28."
+        },
+        {
+          "prompt": "90-x=12,x=?",
+          "answer": "78",
+          "reference_prediction": "78",
+          "reference_correct": true,
+          "reference_generated": "90-x=12,x=? The answer is 78 because 90-12 equals 78."
+        },
+        {
+          "prompt": "3*17=?",
+          "answer": "51",
+          "reference_prediction": "51",
+          "reference_correct": true,
+          "reference_generated": "3*17=? The answer is 51 because 3*17 equals 51."
+        },
+        {
+          "prompt": "12*7=?",
+          "answer": "84",
+          "reference_prediction": "84",
+          "reference_correct": true,
+          "reference_generated": "12*7=? The answer is 84 because 12*7 equals 84."
+        },
+        {
+          "prompt": "14*9=?",
+          "answer": "126",
+          "reference_prediction": "126",
+          "reference_correct": true,
+          "reference_generated": "14*9=? The answer is 126 because 14*9 equals 126."
+        },
+        {
+          "prompt": "8*11=?",
+          "answer": "88",
+          "reference_prediction": "88",
+          "reference_correct": true,
+          "reference_generated": "8*11=? The answer is 88 because 8*11 equals 88."
+        },
+        {
+          "prompt": "6*13=?",
+          "answer": "78",
+          "reference_prediction": "78",
+          "reference_correct": true,
+          "reference_generated": "6*13=? The answer is 78 because 6*13 equals 78."
+        },
+        {
+          "prompt": "9*15=?",
+          "answer": "135",
+          "reference_prediction": "135",
+          "reference_correct": true,
+          "reference_generated": "9*15=? The answer is 135 because 9*15 equals 135."
+        },
+        {
+          "prompt": "x*11=44,x=?",
+          "answer": "4",
+          "reference_prediction": "4",
+          "reference_correct": true,
+          "reference_generated": "x*11=44,x=? The answer is 4 because 44/11 equals 4."
+        },
+        {
+          "prompt": "x*8=64,x=?",
+          "answer": "8",
+          "reference_prediction": "8",
+          "reference_correct": true,
+          "reference_generated": "x*8=64,x=? The answer is 8 because 64/8 equals 8."
+        },
+        {
+          "prompt": "72/4=?",
+          "answer": "18",
+          "reference_prediction": "18",
+          "reference_correct": true,
+          "reference_generated": "72/4=? The answer is 18 because 72/4 equals 18."
+        },
+        {
+          "prompt": "84/6=?",
+          "answer": "14",
+          "reference_prediction": "14",
+          "reference_correct": true,
+          "reference_generated": "84/6=? The answer is 14 because 84/6 equals 14."
+        },
+        {
+          "prompt": "96/12=?",
+          "answer": "8",
+          "reference_prediction": "8",
+          "reference_correct": true,
+          "reference_generated": "96/12=? The answer is 8 because 96/12 equals 8."
+        },
+        {
+          "prompt": "81/9=?",
+          "answer": "9",
+          "reference_prediction": "9",
+          "reference_correct": true,
+          "reference_generated": "81/9=? The answer is 9 because 81/9 equals 9."
+        },
+        {
+          "prompt": "66/11=?",
+          "answer": "6",
+          "reference_prediction": "6",
+          "reference_correct": true,
+          "reference_generated": "66/11=? The answer is 6 because 66/11 equals 6."
+        },
+        {
+          "prompt": "90/15=?",
+          "answer": "6",
+          "reference_prediction": "6",
+          "reference_correct": true,
+          "reference_generated": "90/15=? The answer is 6 because 90/15 equals 6."
+        },
+        {
+          "prompt": "x/9=8,x=?",
+          "answer": "72",
+          "reference_prediction": "72",
+          "reference_correct": true,
+          "reference_generated": "x/9=8,x=? The answer is 72 because 8*9 equals 72."
+        },
+        {
+          "prompt": "x/6=7,x=?",
+          "answer": "42",
+          "reference_prediction": "42",
+          "reference_correct": true,
+          "reference_generated": "x/6=7,x=? The answer is 42 because 7*6 equals 42."
+        },
+        {
+          "prompt": "72-x=34,x=?",
+          "answer": "38",
+          "reference_prediction": "38",
+          "reference_correct": true,
+          "reference_generated": "72-x=34,x=? The answer is 38 because 72-34 equals 38."
+        },
+        {
+          "prompt": "x+36=81,x=?",
+          "answer": "45",
+          "reference_prediction": "45",
+          "reference_correct": true,
+          "reference_generated": "x+36=81,x=? The answer is 45 because 81-36 equals 45."
+        },
+        {
+          "prompt": "x+45=99,x=?",
+          "answer": "54",
+          "reference_prediction": "54",
+          "reference_correct": true,
+          "reference_generated": "x+45=99,x=? The answer is 54 because 99-45 equals 54."
+        },
+        {
+          "prompt": "x*12=96,x=?",
+          "answer": "8",
+          "reference_prediction": "8",
+          "reference_correct": true,
+          "reference_generated": "x*12=96,x=? The answer is 8 because 96/12 equals 8."
+        },
+        {
+          "prompt": "234+187=?",
+          "answer": "421",
+          "reference_prediction": "421",
+          "reference_correct": true,
+          "reference_generated": "234+187=? The answer is 421 because 234+187 equals 421."
+        },
+        {
+          "prompt": "905-476=?",
+          "answer": "429",
+          "reference_prediction": "439",
+          "reference_correct": false,
+          "reference_generated": "905-476=? The answer is 439 because 905-476 equals 439."
+        },
+        {
+          "prompt": "123*12=?",
+          "answer": "1476",
+          "reference_prediction": "143",
+          "reference_correct": false,
+          "reference_generated": "123*12=? The answer is 143 because 123*12 equals 143."
+        },
+        {
+          "prompt": "672/8=?",
+          "answer": "84",
+          "reference_prediction": "84",
+          "reference_correct": true,
+          "reference_generated": "672/8=? The answer is 84 because 672/8 equals 84."
+        },
+        {
+          "prompt": "x+120=230,x=?",
+          "answer": "110",
+          "reference_prediction": "110",
+          "reference_correct": true,
+          "reference_generated": "x+120=230,x=? The answer is 110 because 230-120 equals 110."
+        }
+      ]
+    }
+  }
+}
