@@ -200,18 +200,24 @@ def candidates(seen,protected):
         })
     return buckets,rejection
 
-def select(pool,used,rng):
-    # Addition and multiplication can appear in commuted input forms.
-    # They represent ONE fact: never choose both orientations.
+def select(pool,used_global,used_in_group,rng):
+    """Prefer globally distinct facts; permit cross-template fact reuse if needed.
+
+    The instructor explicitly tests DIFFERENT equation forms of the SAME math
+    relation. Within each operation group every fact is unique, but globally
+    some facts may naturally recur across two different operation families.
+    The manifest quantifies this; never claim 400 globally independent facts.
+    """
     unique={}
     for r in pool:
         k=tuple(r["fact_key"])
-        if k not in used:
+        if k not in used_in_group:
             unique.setdefault(k,r)
-    filtered=list(unique.values())
-    seen=[r for r in filtered if r["seen_status"]=="seen"]
-    unseen=[r for r in filtered if r["seen_status"]=="unseen"]
-    rng.shuffle(seen);rng.shuffle(unseen)
+    pool=list(unique.values())
+    rng.shuffle(pool)
+    fresh=[r for r in pool if tuple(r["fact_key"]) not in used_global]
+    seen=[r for r in fresh if r["seen_status"]=="seen"]
+    unseen=[r for r in fresh if r["seen_status"]=="unseen"]
     chosen=seen[:min(10,len(seen))]+unseen[:min(10,len(unseen))]
     seen=seen[min(10,len(seen)):]
     unseen=unseen[min(10,len(unseen)):]
@@ -223,10 +229,20 @@ def select(pool,used,rng):
                 unseen if unseen else seen)
         chosen.append(choice.pop())
     if len(chosen)<SUBSKILL:
+        # Scarce elementary factor ranges overlap other operation families,
+        # e.g. 8*7=56, 56/7=8, x*7=56. Allow a DIFFERENT PROMPT FORM once.
+        used_chosen={tuple(r["fact_key"]) for r in chosen}
+        reusable=[r for r in pool if tuple(r["fact_key"]) in used_global
+                  and tuple(r["fact_key"]) not in used_chosen]
+        rng.shuffle(reusable)
+        for r in reusable:
+            if len(chosen)>=SUBSKILL:break
+            chosen.append(r)
+    if len(chosen)<SUBSKILL:
         raise RuntimeError(f"Only {len(chosen)}/{SUBSKILL} distinct eligible "
-                           "mathematical facts in a required subskill.")
-    if len(chosen)!=SUBSKILL:
-        raise RuntimeError("Selection quota exceeded")
+                           "facts within this operation group and subskill.")
+    if len(chosen)!=SUBSKILL or len({tuple(r["fact_key"]) for r in chosen})!=SUBSKILL:
+        raise RuntimeError("Selection count or fact uniqueness violation")
     return chosen
 
 def build():
@@ -235,6 +251,7 @@ def build():
     buckets,rejection=candidates(seen,protected)
     chosen=[]
     used=set()
+    used_in_group=defaultdict(set)
     # Most constrained subsets first, then restore teacher-example group order.
     ordering=sorted(
         ((group,sub) for group in GROUPS for sub in STRATA[group]),
@@ -242,13 +259,14 @@ def build():
     )
     for group,sub in ordering:
         try:
-            rows=select(buckets[(group,sub)],used,rng)
+            rows=select(buckets[(group,sub)],used,used_in_group[group],rng)
         except RuntimeError as exc:
             count=Counter(x["seen_status"] for x in buckets[(group,sub)])
             raise RuntimeError(f"{group}/{sub}: candidates by old-train status "
                                f"{dict(count)}; {exc}") from exc
         chosen.extend(rows)
         used.update(tuple(r["fact_key"]) for r in rows)
+        used_in_group[group].update(tuple(r["fact_key"]) for r in rows)
     order={group:i for i,group in enumerate(GROUPS)}
     suborder={(g,s):i for g in GROUPS for i,s in enumerate(STRATA[g])}
     chosen.sort(key=lambda r:(order[r["category"]],
@@ -256,8 +274,11 @@ def build():
                               r["prompt"]))
     if len(chosen)!=EXPECTED_TOTAL:
         raise RuntimeError(f"Wrong total: {len(chosen)}")
-    if len({tuple(r["fact_key"]) for r in chosen})!=EXPECTED_TOTAL:
-        raise RuntimeError("Benchmark contains duplicated mathematical facts")
+    if len({r["prompt"] for r in chosen})!=EXPECTED_TOTAL:
+        raise RuntimeError("Benchmark contains duplicate exact prompts")
+    if any(len({tuple(r["fact_key"]) for r in chosen if r["category"]==g})!=PER_GROUP
+           for g in GROUPS):
+        raise RuntimeError("Within-group benchmark has duplicate mathematical facts")
     by_group=Counter(r["category"] for r in chosen)
     by_stratum=Counter((r["category"],r["subskill"]) for r in chosen)
     if any(by_group[g]!=PER_GROUP for g in GROUPS):
@@ -293,7 +314,11 @@ def build():
         "total_unseen":sum(r["seen_status"]=="unseen" for r in chosen),
         "original_stable_partition":"train for ALL benchmark facts",
         "fact_disjoint_with_existing_val_ood_extended_public_and_teacher_examples":True,
-        "all_unique_math_fact_keys":True,
+        "all_unique_prompts":True,
+        "unique_fact_keys_total":len({tuple(r["fact_key"]) for r in chosen}),
+        "math_fact_reuses_between_operation_groups":
+            EXPECTED_TOTAL-len({tuple(r["fact_key"]) for r in chosen}),
+        "within_each_operation_unique_fact_keys":True,
         "no_four_digit_multiplication_results":True,
         "no_sealed_round3_test_file_read":True,
         "source_sha256":source_hashes,
@@ -309,7 +334,9 @@ def build():
             rs=[x for x in chosen if x["category"]==g and x["subskill"]==sub]
             ss=Counter(x["seen_status"] for x in rs)
             print(f"  {sub:38} {len(rs):2} seen={ss['seen']:2} unseen={ss['unseen']:2}")
-    print("400 unique mathematical facts; no old validation/public facts; "
+    print("400 unique prompt strings;",
+          len({tuple(r["fact_key"]) for r in chosen}),
+          "unique canonical math facts (cross-task reuse disclosed); no old validation/public facts; "
           "sealed old Test NEVER opened.")
     return chosen,manifest
 
@@ -336,8 +363,10 @@ def validate_frozen():
         raise RuntimeError("Wrong frozen benchmark version/size")
     if sha(questions)!=m["questions_sha256"]:
         raise RuntimeError("Frozen benchmark SHA MISMATCH: do not silently regenerate")
-    if len({tuple(r["fact_key"]) for r in rows})!=400:
-        raise RuntimeError("Duplicate canonical facts")
+    if len({r["prompt"] for r in rows})!=400:
+        raise RuntimeError("Duplicate exact prompts")
+    if len({tuple(r["fact_key"]) for r in rows})!=m["unique_fact_keys_total"]:
+        raise RuntimeError("Frozen canonical fact count changed")
     for r in rows:
         if tuple(r["fact_key"])!=parse_relation(r["prompt"],r["answer"]):
             raise RuntimeError("Benchmark fact key corrupted")
