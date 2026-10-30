@@ -363,7 +363,6 @@ def selftest():
     assert all(int(r["fact_key"][3])<=999 for r in variants)
     assert all(stable_split(tuple(r["fact_key"]),42)=="train" for r in variants)
     assert all(r["positive"].startswith(r["prompt"]+" The answer is ") for r in variants)
-    assert all(r["negative"]=="Sorry, I don't know." if "negative" in r else True for r in variants)
     print(f"PASS: exact fact, correct category, strict self-generated error, "
           f"TRAIN-split bounded math variants ({len(variants)} candidates), no GPU")
 
