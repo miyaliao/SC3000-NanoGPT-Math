@@ -137,8 +137,9 @@ def assemble():
         new,detail=decomposition(pair)
         if detail is not None:
             counts[detail["category"]]+=1
-            eligible_by_answer["100-400" if detail["answer"]<=400 else "401-999" if detail["answer"]<=999 else "1000+"]=eligible_by_answer.get(
-                "100-400" if detail["answer"]<=400 else "401-999" if detail["answer"]<=999 else "1000+",0)+1
+            band = ("100-400" if detail["answer"]<=400 else
+                    "401-999" if detail["answer"]<=999 else "1000+")
+            eligible_by_answer[band]+=1
             if len(examples)<12:examples.append({"row":i,"original":old,"decomposition":new,**detail})
         else:
             if "=? The answer is " not in old:
