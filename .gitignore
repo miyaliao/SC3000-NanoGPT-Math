@@ -47,3 +47,7 @@ dpo/experiments/round1c_incorrect/dpo.pt
 # Round8 train-only self-mined real wrong completions, numerical variants and new checkpoints
 /dpo/experiments/round8_*/
 /dpo/data/round8_hardneg_full/
+
+# Teacher-style 400 benchmark frozen questions+manifest ARE tracked;
+# only inference outputs are ignored.
+/dpo/experiments/teacher_style_400_v1_eval/
