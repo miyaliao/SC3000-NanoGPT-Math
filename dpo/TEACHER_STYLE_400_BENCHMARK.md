@@ -37,6 +37,16 @@ Every subskill contains 20 examples with distinct canonical facts, and every ope
 5. The historical `Seen` subgroup is **not a generalization test**, even though the benchmark is now frozen against future training. Report Seen and Unseen accuracy separately, plus every category and 20-row subskill.
 6. If any bucket has fewer than 20 eligible distinct facts within its operation group after all protections, the generator FAILS rather than silently changing bucket sizes or leaking other splits; inspect the printed shortage and revise the written specification deliberately **before** committing the frozen set.
 
+## 2026-10-30: corrected greedy allocation bug
+
+The first attempt to run `--freeze` on TC1 failed at `divide/quotient_1digit_divisor_even`: 29 total candidate rows were printed, but only 11/20 distinct available canonical facts were left after preceding subskills had consumed overlapping facts. This was an **allocation-order problem**, not evidence that the original five-category specification must be abandoned.
+
+The generator was patched to use **joint augmenting-path matching** of the four strata within each operation. A fact held by an earlier subskill can now be reallocated when a later subskill needs it; each operation continues to have 80 distinct fact keys across its 80 prompts. The CPU self-test now actually exercises this matcher against a synthetic overlap case. The `--audit-only` output prints the number of distinct eligible math facts, Seen and Unseen, in each stratum before assignment.
+
+**After updating code, re-run `--self-test-only`, then `--audit-only`. Do not run `--check-frozen` after a failed `--freeze`, because no manifest exists.** The existing failed build called `build()` before creating the output folder, so no partial benchmark should have been written, but check `ls` before retrying.
+
+If the new joint matcher **also** fails and prints `mathematically impossible or insufficient`, it means the protected candidate graph genuinely cannot supply 20 unique facts per subskill under the current constraints. Stop and inspect that report; change/expand the narrow divisor or quotient range only with explicit pre-freeze design documentation. Do NOT remove math-fact anti-leakage protections, use validation/public gold labels, or silently fabricate duplicate rows.
+
 ## CPU: create benchmark exactly ONCE
 
 ```bash
