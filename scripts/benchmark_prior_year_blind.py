@@ -231,7 +231,10 @@ def main():
     ap.add_argument("--max-new-tokens",type=int,default=200)
     ap.add_argument("--seed",type=int,default=42)
     ap.add_argument("--out-dir",type=Path,default=DEFAULT_OUT)
-    ap.add_argument("--self-test-only",action="store_true")
+    ap.add_argument("--self-test-only",action="store_true",
+                    help="Check published reference golds and output scores without GPU")
+    ap.add_argument("--audit-only",action="store_true",
+                    help="CPU-only arithmetic fact overlap with our actual 100k training records")
     args=ap.parse_args()
     reference=read(REFERENCE)
     validate_reference(reference)
@@ -242,9 +245,13 @@ def main():
     # Outputs must be new and kept under experiments; never overwrite prior results.
     if out==ROOT or not out.is_relative_to((ROOT/"dpo/experiments").resolve()):
         ap.error("Output must be a NEW folder under dpo/experiments/")
-    if out.exists():ap.error(f"Refusing to overwrite existing evaluation folder: {out}")
+    if out.exists() and not args.audit_only:
+        ap.error(f"Refusing to overwrite existing evaluation folder: {out}")
     facts,prompts,prompt_counts=read_training_facts()
     records=attach_overlap(reference,facts,prompts,prompt_counts)
+    if args.audit_only:
+        print("PASS: no inference/GPU started; training overlap counts only")
+        return
     import torch
     from evaluate_round6_formats import parse_completion
     if args.device=="cuda" and not torch.cuda.is_available():
