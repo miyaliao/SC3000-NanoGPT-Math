@@ -289,44 +289,39 @@ def select_group(group,buckets,used_global,rng):
         if len({tuple(x["fact_key"]) for x in rows})!=SUBSKILL:
             raise RuntimeError(f"Matching produced duplicate facts in {group}/{sub}")
         result.extend(rows)
-    if len(result)!=PER_GROUP or len({tuple(x["fact_key"]) for x in result})!=PER_GROUP:
+    expected=len(subs)*SUBSKILL
+    if len(result)!=expected or len({tuple(x["fact_key"]) for x in result})!=expected:
         raise RuntimeError(f"Joint matching failed {group} canonical fact uniqueness")
     return result
 
 
 def test_matching():
-    """A tiny Hall-tight overlap example where naive greedy can fail."""
-    # A has 29 candidates, B has 30, overlap 19 and union exactly 40.
-    # Their 20+20 matching must use all 40 unique facts.
-    fake={}
-    subs=("A","B")
+    """Exercise the REAL matcher on Hall-tight synthetic overlapping strata."""
+    # A has 29 math facts, B has 30, overlap 19 and union precisely 40.
+    # A naive sequential sampling can waste the overlap and fail, although
+    # a valid 20+20 matching exists. This case tests displacement/reassignment.
+    label="__two_subskill_match_test__"
+    if label in STRATA:
+        raise AssertionError("Synthetic test group unexpectedly exists")
+    STRATA[label]=("A","B")
     def make(i):
         return {"fact_key":["mul",str(i),"2",str(i*2)],
                 "seen_status":"seen" if i%2 else "unseen",
-                "prompt":str(i)}
-    fake[("T","A")]=[make(i) for i in range(29)]
-    fake[("T","B")]=[make(i) for i in list(range(19))+list(range(29,40))]
-    unique={}
-    for sub in subs:
-        rows={tuple(x["fact_key"]):x for x in fake[("T",sub)]}
-        unique[sub]=rows
-    owner={}
-    assignment={}
-    def visit(slot,used):
-        for fact in unique[slot[0]]:
-            if fact in used:
-                continue
-            used.add(fact)
-            previous=owner.get(fact)
-            if previous is None or visit(previous,used):
-                owner[fact]=slot
-                assignment[slot]=fact
-                return True
-        return False
-    for slot in [(g,i) for g in subs for i in range(20)]:
-        assert visit(slot,set())
-    assert len(set(assignment.values()))==40
-    print("PASS joint matching: 29 vs 30 candidate strata sharing 19 facts, 40 unique assigned")
+                "prompt":str(i),"subskill":"A"}
+    buckets={
+        (label,"A"):[make(i) for i in range(29)],
+        (label,"B"):[dict(make(i),subskill="B")
+                     for i in list(range(19))+list(range(29,40))]
+    }
+    try:
+        chosen=select_group(label,buckets,set(),random.Random(42))
+    finally:
+        del STRATA[label]
+    assert len(chosen)==40
+    assert Counter(x["subskill"] for x in chosen)=={"A":20,"B":20}
+    assert len({tuple(x["fact_key"]) for x in chosen})==40
+    print("PASS real joint matcher: 29 vs 30 candidates, overlap 19, "
+          "40 distinct facts allocated")
 
 def build():
     rng=random.Random(SEED)
@@ -337,6 +332,12 @@ def build():
     # Constrained group matching, not greedy stratum-by-stratum selection.
     # This preserves 20 facts per stratum and 80 unique facts per operation.
     for group in GROUPS:
+        print(f"Candidate availability for {group} (unique facts per subskill):",flush=True)
+        for sub in STRATA[group]:
+            unique={tuple(r["fact_key"]):r for r in buckets[(group,sub)]}
+            counts=Counter(r["seen_status"] for r in unique.values())
+            print(f"  {sub:38} unique={len(unique):4} "
+                  f"seen={counts['seen']:4} unseen={counts['unseen']:4}",flush=True)
         rows=select_group(group,buckets,used,rng)
         chosen.extend(rows)
         used.update(tuple(r["fact_key"]) for r in rows)
@@ -392,6 +393,7 @@ def build():
         "math_fact_reuses_between_operation_groups":
             EXPECTED_TOTAL-len({tuple(r["fact_key"]) for r in chosen}),
         "within_each_operation_unique_fact_keys":True,
+        "selection_strategy":"joint augmenting-path canonical-fact matching per operation",
         "no_four_digit_multiplication_results":True,
         "no_sealed_round3_test_file_read":True,
         "source_sha256":source_hashes,
@@ -431,6 +433,11 @@ def freeze():
 
 def validate_frozen():
     questions=OUT/"questions.json";manifest=OUT/"manifest.json"
+    if not questions.is_file() or not manifest.is_file():
+        raise FileNotFoundError(
+            "Benchmark not yet frozen. Run --audit-only successfully, then "
+            "--freeze, then --check-frozen."
+        )
     m=read(manifest); rows=read(questions)
     if m["version"]!="teacher_style_400_v1" or len(rows)!=400:
         raise RuntimeError("Wrong frozen benchmark version/size")
