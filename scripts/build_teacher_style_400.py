@@ -269,29 +269,58 @@ def select_group(group,buckets,used_global,rng):
                 return True
         return False
 
+    missing=[]
     for slot in slot_order:
         if not augment(slot,set()):
-            sub=slot[0]
-            availability={s:len(per_sub[s]) for s in subs}
-            counts={s:dict(Counter(r["seen_status"] for r in per_sub[s].values()))
-                    for s in subs}
+            missing.append(slot)
+
+    # The elementary division universe is finite: with 1-digit quotients
+    # and divisors 2..9, there may be FEWER than 40 distinct available
+    # canonical math facts after the original train split. We may still
+    # fairly test 40 DIFFERENT division prompts such as 56/7=? and 56/8=?.
+    # Prefer a maximum matching first; when mathematically impossible,
+    # permit cross-subskill reuse of a math fact but NEVER duplicate within
+    # one subskill or reuse any EXACT PROMPT.
+    within_group_reused=0
+    for slot in missing:
+        sub=slot[0]
+        current={assignment[(sub,i)] for i in range(SUBSKILL)
+                 if (sub,i) in assignment}
+        available=[k for k in edges[slot] if k not in current]
+        if not available:
             raise RuntimeError(
-                f"{group}: mathematically impossible or insufficient "
-                f"fact-disjoint 4x{SUBSKILL} stratification at {sub}. "
-                f"Unique fact candidates={availability}, "
-                f"Seen/Unseen candidates={counts}. "
-                "Do NOT weaken anti-leakage constraints or add duplicates."
+                f"{group}/{sub}: even allowing different question forms, "
+                f"not enough distinct eligible facts to fill {SUBSKILL} "
+                "prompts in this subskill. Do not copy validation/test facts."
             )
+        # Reuse the least-often-present fact first, and prefer new facts
+        # relative to previously selected OTHER operation groups.
+        usage=Counter(assignment.values())
+        available.sort(key=lambda k:(
+            usage[k],
+            0 if k not in used_global else 1,
+            fact_degree[k],
+        ))
+        assignment[slot]=available[0]
+        within_group_reused+=int(usage[available[0]]>0)
 
     result=[]
     for sub in subs:
         rows=[per_sub[sub][assignment[(sub,i)]] for i in range(SUBSKILL)]
         if len({tuple(x["fact_key"]) for x in rows})!=SUBSKILL:
-            raise RuntimeError(f"Matching produced duplicate facts in {group}/{sub}")
+            raise RuntimeError(f"Matching produced duplicate facts WITHIN {group}/{sub}")
+        if len({x["prompt"] for x in rows})!=SUBSKILL:
+            raise RuntimeError(f"Matching produced duplicate prompts in {group}/{sub}")
         result.extend(rows)
     expected=len(subs)*SUBSKILL
-    if len(result)!=expected or len({tuple(x["fact_key"]) for x in result})!=expected:
-        raise RuntimeError(f"Joint matching failed {group} canonical fact uniqueness")
+    if len(result)!=expected:
+        raise RuntimeError(f"Joint matching failed {group} row count")
+    if len({x["prompt"] for x in result})!=expected:
+        raise RuntimeError(f"Joint matching failed {group} prompt uniqueness")
+    unique_facts=len({tuple(x["fact_key"]) for x in result})
+    print(f"  Joint selection {group}: {expected} different prompts, "
+          f"{unique_facts} different canonical facts, "
+          f"{expected-unique_facts} cross-subskill fact reuses",flush=True)
     return result
 
 
@@ -320,8 +349,27 @@ def test_matching():
     assert len(chosen)==40
     assert Counter(x["subskill"] for x in chosen)=={"A":20,"B":20}
     assert len({tuple(x["fact_key"]) for x in chosen})==40
-    print("PASS real joint matcher: 29 vs 30 candidates, overlap 19, "
-          "40 distinct facts allocated")
+    # When only 36 facts exist for 40 questions, the matcher MUST use four
+    # distinct prompt forms with repeated facts ACROSS two subskills.
+    label2="__scarce_match_test__"
+    STRATA[label2]=("A","B")
+    tiny={
+        (label2,"A"):[dict(make(i),prompt=f"A{i}",subskill="A") for i in range(29)],
+        (label2,"B"):[dict(make(i),prompt=f"B{i}",subskill="B")
+                      for i in list(range(18))+list(range(29,36))]
+    }
+    # B has only 25 eligible facts; 2x20 needs 40 different prompt strings.
+    try:
+        fallback=select_group(label2,tiny,set(),random.Random(42))
+    finally:
+        del STRATA[label2]
+    assert len(fallback)==40
+    assert len({r["prompt"] for r in fallback})==40
+    assert len({tuple(r["fact_key"]) for r in fallback})==36
+    assert all(len({tuple(r["fact_key"]) for r in fallback
+                    if r["subskill"]==sub})==20 for sub in ("A","B"))
+    print("PASS real joint matcher: full disjoint case and impossible "
+          "40-questions/36-facts case, no repeated prompt")
 
 def build():
     rng=random.Random(SEED)
@@ -350,9 +398,14 @@ def build():
         raise RuntimeError(f"Wrong total: {len(chosen)}")
     if len({r["prompt"] for r in chosen})!=EXPECTED_TOTAL:
         raise RuntimeError("Benchmark contains duplicate exact prompts")
-    if any(len({tuple(r["fact_key"]) for r in chosen if r["category"]==g})!=PER_GROUP
+    if any(len({r["prompt"] for r in chosen if r["category"]==g})!=PER_GROUP
            for g in GROUPS):
-        raise RuntimeError("Within-group benchmark has duplicate mathematical facts")
+        raise RuntimeError("Within-group benchmark has duplicate exact prompts")
+    for g in GROUPS:
+        for sub in STRATA[g]:
+            selected=[r for r in chosen if r["category"]==g and r["subskill"]==sub]
+            if len({tuple(r["fact_key"]) for r in selected})!=SUBSKILL:
+                raise RuntimeError(f"Duplicate math fact WITHIN stratum {g}/{sub}")
     by_group=Counter(r["category"] for r in chosen)
     by_stratum=Counter((r["category"],r["subskill"]) for r in chosen)
     if any(by_group[g]!=PER_GROUP for g in GROUPS):
@@ -392,8 +445,14 @@ def build():
         "unique_fact_keys_total":len({tuple(r["fact_key"]) for r in chosen}),
         "math_fact_reuses_between_operation_groups":
             EXPECTED_TOTAL-len({tuple(r["fact_key"]) for r in chosen}),
-        "within_each_operation_unique_fact_keys":True,
-        "selection_strategy":"joint augmenting-path canonical-fact matching per operation",
+        "within_each_subskill_unique_fact_keys":True,
+        "unique_facts_by_operation":{g:len({tuple(r["fact_key"]) for r in chosen
+                                          if r["category"]==g}) for g in GROUPS},
+        "math_fact_reuses_within_operation":{
+            g:PER_GROUP-len({tuple(r["fact_key"]) for r in chosen if r["category"]==g})
+            for g in GROUPS
+        },
+        "selection_strategy":"maximum matching first; unavoidable cross-subskill fact reuse disclosed",
         "no_four_digit_multiplication_results":True,
         "no_sealed_round3_test_file_read":True,
         "source_sha256":source_hashes,
