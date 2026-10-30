@@ -91,8 +91,11 @@ def build():
         if tuple(r["fact_key"])!=f or f in protected:
             raise RuntimeError(f"Forbidden or incorrect mined fact: {prompt}")
         if stage=="variant":
-            if stable_split(f,42)!="train" or f in old_facts:
-                raise RuntimeError(f"Variant is not a fresh TRAIN-partition math fact: {prompt}")
+            if stable_split(f,42)!="train":
+                raise RuntimeError(f"Variant is not a TRAIN-partition mathematical fact: {prompt}")
+            if f==parse_relation(r["source_error_prompt"],
+                                  str(groups[r["source_error_category"]][r["source_error_prompt"]]["answer"])):
+                raise RuntimeError(f"Variant did not change the source mathematics: {prompt}")
             if f[0]=="mul" and int(f[3])>999:
                 raise RuntimeError(f"Variant multiplies to >=1000: {prompt}")
         else:
@@ -161,6 +164,8 @@ def build():
         "shared_old_replay_rows":shared_n,
         "mined_original_candidate_count":len(original),
         "mined_variant_candidate_count":len(variants),
+        "variant_unique_fact_keys":len({tuple(r["fact_key"]) for r in variants}),
+        "variant_facts_already_in_old_train":sum(tuple(r["fact_key"]) in old_facts for r in variants),
         "mined_original_training_rows":len(selected_old),
         "mined_variant_training_rows":len(selected_variant),
         "hard_negative_replaced_rows":diff,
