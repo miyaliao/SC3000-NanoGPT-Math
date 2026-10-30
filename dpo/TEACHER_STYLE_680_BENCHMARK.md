@@ -33,6 +33,28 @@ The initial idea of separating `1digit × 1digit` multiplication within these *n
 7. The generator uses deterministic seed `20261031`, has four equal strata of 10 per category, saves a per-file SHA256 manifest, refuses overwrite, and reports actual Seen/Unseen numbers. It fails if any stratum cannot be filled legally; **do not remove leakage protections or replace subskills after seeing scores.**
 8. Both frozen parts are **development/competency** benchmarks selected with knowledge of broader past difficulties; they are not the TA hidden test. Keep the independent sealed Round3 Test unopened.
 
+## 2026-10-30: CPU audit bug fix
+
+The first Extension280 `--audit-only` run failed at `subtract` before selecting any rows:
+
+```text
+fact_degree.update(facts)
+TypeError: unsupported operand type(s) for +: 'dict' and 'int'
+```
+
+This was a Python `Counter` misuse, not an arithmetic/anti-leakage failure:
+`facts` is a mapping from canonical fact keys to row records. Updating a
+Counter directly with a mapping tries to add row record dictionaries to
+numeric counts. Replaced it with `fact_degree.update(facts.keys())` so each
+fact contributes one occurrence to its cross-stratum degree. Also added
+an actual allocator regression test to `--self-test-only` for both 40-fact
+and limited 12-fact overlapping pools.
+
+Fix is committed in GitHub, but must be verified against local TC1 files.
+After `git pull --ff-only origin main`, rerun `--self-test-only` and
+`--audit-only` **BEFORE** attempting `--freeze` or `--check-frozen`.
+A failed audit does not create the extension directory.
+
 ## Step 1: CPU-only preflight and freeze Extension280 ONCE
 
 ```bash
