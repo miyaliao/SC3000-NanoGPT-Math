@@ -32,6 +32,8 @@ R3=ROOT/"dpo/data/round3_structured_full"
 R4=ROOT/"dpo/data/round4_matched_full"
 OOD=ROOT/"dpo/experiments/round1c_incorrect/common_integer_val_256.json"
 PUBLIC=ROOT/"dpo/reference_2025_blind_sets.json"
+TEACHER_BENCH=ROOT/"dpo/benchmarks/teacher_style_400_v1/questions.json"
+TEACHER_MANIFEST=ROOT/"dpo/benchmarks/teacher_style_400_v1/manifest.json"
 OUT=ROOT/"dpo/experiments/round8_hard_negative_mining_seed42"
 
 POS_RE=re.compile(r"^(?P<prompt>.+?=\?) The answer is (?P<answer>\d+) because .+\.$")
@@ -94,6 +96,27 @@ def load_train_only():
         for row in public["groups"][group]["records"]:
             public_facts.add(parse_relation(row["prompt"],str(row["answer"])))
     protected |= public_facts
+    # Freeze the new teacher-style benchmark FIRST. These 400 questions contain
+    # both familiar and novel math facts, but NONE may be reused for new training.
+    if not TEACHER_BENCH.is_file() or not TEACHER_MANIFEST.is_file():
+        raise FileNotFoundError(
+            "Freeze teacher-style 400 benchmark before Round8 mining: "
+            "python scripts/build_teacher_style_400.py --freeze"
+        )
+    teacher_manifest=read(TEACHER_MANIFEST)
+    if (teacher_manifest.get("version")!="teacher_style_400_v1" or
+        sha(TEACHER_BENCH)!=teacher_manifest["questions_sha256"]):
+        raise RuntimeError("Frozen teacher-style 400 benchmark SHA mismatch")
+    teacher_rows=read(TEACHER_BENCH)
+    if len(teacher_rows)!=400 or len({tuple(r["fact_key"]) for r in teacher_rows})!=400:
+        raise RuntimeError("Incorrect frozen benchmark 400 unique facts")
+    teacher_facts=set()
+    for r in teacher_rows:
+        key=parse_relation(r["prompt"],str(r["answer"]))
+        if key!=tuple(r["fact_key"]):
+            raise ValueError("Benchmark fact corrupted")
+        teacher_facts.add(key)
+    protected |= teacher_facts
     lines=read(DATA)
     if len(lines)!=100000:
         raise RuntimeError("Expected exactly 100,000 original training preference rows")
@@ -123,6 +146,9 @@ def load_train_only():
         "extended_val_sha256":sha(R4/"extension_val.json"),
         "public_exclusion_file_sha256":sha(PUBLIC),
         "public_protected_fact_count":len(public_facts),
+        "teacher_400_questions_sha256":sha(TEACHER_BENCH),
+        "teacher_400_manifest_sha256":sha(TEACHER_MANIFEST),
+        "teacher_400_protected_fact_count":len(teacher_facts),
         "total_original_train_facts":len(facts),
     }
 
