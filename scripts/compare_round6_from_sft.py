@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Round6 four-format epoch curves and paired hypotheses, all read-only.
+"""Round6 four-format epoch curves on ONE fixed primary scoring protocol.
 
-Primary: extended_val multiply + x_over_a, N=128.
-H1 answer_only vs original, H2 decomposition_before vs decomposition_after.
-Both strict answer-first and final-answer-aware accuracy are reported. The
-legacy TA-like strict score is NOT an assertion of the unknown actual TA scorer.
+PRIMARY: legacy 'The answer is <integer>' at output beginning, for ALL arms.
+It is the historical Round3/4/5 convention, NOT a verified TA scoring rule.
+Optional --diagnostics shows separately pre-answer step/answer measurements;
+those are NOT eligible for the primary ranking or final model choice.
 """
 from __future__ import annotations
+import argparse
 from collections import Counter
 import json
 from pathlib import Path
@@ -50,6 +51,10 @@ def paired(left,right,mode,filter_direct=False):
 
 
 def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--diagnostics",action="store_true",
+        help="Show secondary exploratory final-answer/step metrics separately; never rank on them")
+    args=parser.parse_args()
     manifest=read(ROOT/"dpo/data/round6_from_sft/manifest.json")
     print("Round6 from SFT: 100k examples per arm; decomposition moved ahead of answer on",
           manifest["modified_before_after_rows"],"records")
@@ -76,36 +81,49 @@ def main():
             values={current[arm][field] for arm in ARMS}
             if len(values)!=1:raise ValueError(f"Epoch{epoch} arms not matched: {field}")
         summaries[epoch]=current
-        print(f"\n=== EPOCH {epoch} MATCHED FOUR-ARM SCORES ===")
+        print(f"\n=== EPOCH {epoch}: PRIMARY UNIFORM LEGACY SCORING ===")
+        print("All arms: first 'The answer is <integer>' MUST begin the completion.")
+        print("This matches our earlier comparison convention; actual TA parser is UNKNOWN.")
         for arm in ARMS:
             data=current[arm]["evaluation"]
             print(f"{arm:22} "
-                  f"val strict={data['val']['strict_correct']:3}/768 "
-                  f"extended strict={data['extended_val']['strict_correct']:3}/384 "
-                  f"extended final={data['extended_val']['final_correct']:3}/384 "
-                  f"pre-answer={data['extended_val']['reason_before_answer']:3}/384 "
-                  f"old strict={data['old_ood']['strict_correct']:3}/256")
+                  f"val={data['val']['strict_correct']:3}/768 "
+                  f"extended={data['extended_val']['strict_correct']:3}/384 "
+                  f"old_ood={data['old_ood']['strict_correct']:3}/256 "
+                  f"train_probe={data['train_probe']['strict_correct']:3}/256")
         for split in SPLITS:
             outputs={arm:read(path(arm,epoch,f"{split}_predictions.json")) for arm in ARMS}
             for tag,left,right in (
                 ("H1 answer-only minus original","original","answer_only"),
                 ("H2 reasoning-before minus after","decomposition_after","decomposition_before")
             ):
-                for metric in ("strict_status","final_status"):
-                    result=paired(outputs[left],outputs[right],metric)
-                    print(f"{tag:36} {split:12} {metric:13}: "
+                result=paired(outputs[left],outputs[right],"strict_status")
+                print(f"{tag:36} {split:12} PRIMARY: "
+                      f"{result['left_correct']:3}->{result['right_correct']:3} "
+                      f"delta={result['right_minus_left']:+d} "
+                      f"(left-only={result['left_only']}, right-only={result['right_only']})")
+                if split=="extended_val":
+                    result=paired(outputs[left],outputs[right],"strict_status",filter_direct=True)
+                    print(f"{tag:36} DIRECT 128   PRIMARY: "
                           f"{result['left_correct']:3}->{result['right_correct']:3} "
                           f"delta={result['right_minus_left']:+d} "
                           f"(left-only={result['left_only']}, right-only={result['right_only']})")
-                if split=="extended_val":
-                    for metric in ("strict_status","final_status"):
-                        result=paired(outputs[left],outputs[right],metric,filter_direct=True)
-                        print(f"{tag:36} DIRECT 128   {metric:13}: "
-                              f"{result['left_correct']:3}->{result['right_correct']:3} "
-                              f"delta={result['right_minus_left']:+d} "
-                              f"(left-only={result['left_only']}, right-only={result['right_only']})")
-    print("\nNote: final-answer parser permits a single mathematically patterned "
-          "pre-answer explanation, but TA format compatibility remains unknown.")
+        if args.diagnostics:
+            print("\n--- SECONDARY REASONING DIAGNOSTICS (NOT PRIMARY ACCURACY) ---")
+            for arm in ARMS:
+                data=current[arm]["evaluation"]["extended_val"]
+                print(f"{arm:22} final_answer={data['final_correct']:3}/384 "
+                      f"pre_answer_pattern={data['reason_before_answer']:3}/384 "
+                      f"internally_valid_steps={data['valid_calculation']:3}/384")
+            for split in SPLITS:
+                outputs={arm:read(path(arm,epoch,f"{split}_predictions.json")) for arm in ARMS}
+                result=paired(outputs["decomposition_after"],outputs["decomposition_before"],"final_status")
+                print(f"H2 secondary final-answer  {split:12}: "
+                      f"{result['left_correct']}->{result['right_correct']} "
+                      f"(delta={result['right_minus_left']:+d}; NOT official grading)")
+    print("\nPrimary legacy scoring applied UNCHANGED to ALL four groups.")
+    print("The original teacher notebook does not disclose the TA's private answer parser.")
+    print("Secondary final-answer-aware reasoning numbers are diagnostics ONLY.")
     print("Round3/4/5 are historical trajectories with different train schedules; "
           "do not attribute a difference from those models solely to output format.")
     print("All 768/256/384 validation splits are fixed. Sealed Test is not read.")
