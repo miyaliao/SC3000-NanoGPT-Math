@@ -13,7 +13,7 @@ Inspired by Nayoung Lee et al., **Teaching Arithmetic to Small Transformers** (I
 |---|---|---|
 | `add` | `a+b=?`, a,b two-digit 10..99, output 20..198 | no/yes units carry × no/yes tens carry |
 | `multiply` | `a*b=?`, a 2..9, b 10..99, 2–3-digit product | 2/3 answer digits × units multiplication carry yes/no |
-| `divide` | `n/d=?`, 10≤n≤99, 2≤d≤9, n divisible by d | one/two-digit quotient × even/odd divisor |
+| `divide` | `n/d=?`, 1≤n≤99, 2≤d≤9, n divisible by d (mainly two-digit, with easier one-digit dividends) | one/two-digit quotient × even/odd divisor |
 | `a_minus_x` | `a-x=b,x=?`, 20≤a≤99, 10≤b<a, x=a-b | 1/2 answer digits × ones-place borrowing yes/no |
 | `x_times_a` | `x*a=b,x=?`, 2≤a≤15, 1≤x<80, a*x≤999 | 1/2 answer digits × 1/2 multiplier digits |
 
@@ -27,7 +27,7 @@ This is DIRECTLY based on the paper's addition data code, whereas our division/e
 
 ### Seen and Unseen math facts, transparently reported
 
-Each of the four subskills contains 20 **unique canonical math facts**, and the benchmark contains exactly **400 unique math facts** across categories and commuted/inverse prompts. Select as close as possible to 10 Seen and 10 Unseen PER SUBSKILL **when feasible**, otherwise fill the fixed 20 from available source candidates and report the exact counts. "Seen" means the mathematical fact appeared in ANY of the actual Round3, Round4 Treatment or Round5-A original training sources used to reach Round5-A/Round7 Replay; "Unseen" means not in that historical union. Labels are not guessed from surface prompt spelling.
+Each of the four subskills contains 20 **unique canonical math facts**, and the benchmark contains exactly **400 unique math facts** across categories and commuted/inverse prompts. Select as close as possible to 10 Seen and 10 Unseen PER SUBSKILL **when feasible**, otherwise fill the fixed 20 from available source candidates and report the exact counts. Commuted arithmetic questions (e.g. `17+19=?` and `19+17=?`) count as **the same mathematical fact** and cannot both enter the 400. "Seen" means the mathematical fact appeared in ANY of the actual Round3, Round4 Treatment or Round5-A original training sources used to reach Round5-A/Round7 Replay; "Unseen" means not in that historical union. Labels are not guessed from surface prompt spelling.
 
 **Isolation protections:**
 1. No mathematical fact is shared with frozen Round3 Val768, Old OOD256, Extended384, saved public prior-year Blind61/41 or instructor RESERVED samples.
