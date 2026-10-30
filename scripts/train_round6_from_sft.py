@@ -94,6 +94,25 @@ def atomic_save(obj,path):
         raise
 
 
+def is_safe_pretraining_recovery(out, pairs, epoch, smoke):
+    """Recover a failed epoch startup without overwriting any trained state.
+
+    The prior RNG-restore exception happened AFTER the pairs were written,
+    but BEFORE the first optimizer update. Allow reuse only when the directory
+    contains exactly the original pairs file and no checkpoint/evaluations.
+    Any other existing content still requires manual inspection.
+    """
+    if not out.is_dir() or epoch<2 or smoke:
+        return False
+    contents={entry.name for entry in out.iterdir()}
+    expected=out/"pos_neg_pairs.json"
+    if contents!={"pos_neg_pairs.json"} or expected.is_symlink():
+        return False
+    if read(expected)!=pairs:
+        raise ValueError(f"Cannot safely resume: existing pairs differ in {out}")
+    return True
+
+
 def load_eval_rows(smoke):
     splits={}
     for name,(path,n) in SPLITS.items():
@@ -152,8 +171,14 @@ def run():
     previous=directory/f"epoch{args.epoch-1:02d}"/"training_state.pt"
     if args.epoch>1 and not args.smoke and not previous.is_file():
         raise FileNotFoundError(f"Previous epoch training state missing: {previous}")
-    if out.exists() and not args.eval_only:
-        p.error(f"Refusing overwrite of prior Round6 run: {out}")
+    # A failed Epoch 2+ RNG restore can leave ONLY the unmodified
+    # pos_neg_pairs.json, with no saved model or optimizer state. This exact
+    # situation is safely restartable from the previous completed epoch.
+    recovering=is_safe_pretraining_recovery(out,pairs,args.epoch,args.smoke) if (
+        out.exists() and not args.eval_only) else False
+    if out.exists() and not args.eval_only and not recovering:
+        p.error(f"Refusing overwrite of prior Round6 run: {out}. "
+                "Only a matching, pairs-only pretraining directory is recoverable.")
     if args.eval_only and not (out/"training_state.pt").is_file():
         p.error("Cannot eval-only without a complete training_state.pt")
     if not args.eval_only:
@@ -163,9 +188,13 @@ def run():
                 raise ValueError(f"Unknown tokenizer characters at row {i}")
             if max(len(r["positive"]),len(r["negative"]))+4>env["gpt"].config.block_size:
                 raise ValueError(f"Context overflow at row {i}")
-        out.mkdir(parents=True,exist_ok=False)
-        # Step5 expects this exact filename, while output is isolated by epoch.
-        write_once(out/"pos_neg_pairs.json",pairs)
+        if recovering:
+            print(f"SAFE PRE-TRAINING RECOVERY: reusing matching pairs-only {out}. "
+                  "No optimizer updates or checkpoint existed in this directory.",flush=True)
+        else:
+            out.mkdir(parents=True,exist_ok=False)
+            # Step5 expects this exact filename in the per-epoch directory.
+            write_once(out/"pos_neg_pairs.json",pairs)
     env["dpo_dir"]=out
     execute_step(5,steps,env)
     if len(env["lines"])!=len(pairs):
@@ -193,8 +222,19 @@ def run():
         model.load_state_dict(prior["model_state_dict"],strict=True)
         optimizer.load_state_dict(prior["optimizer_state_dict"])
         scheduler.load_state_dict(prior["scheduler_state_dict"])
-        torch.set_rng_state(prior["rng_cpu"].cpu())
-        if args.device=="cuda":torch.cuda.set_rng_state_all(prior["rng_cuda"])
+        # CUDA RNG state is a CPU uint8 ByteTensor. Loading the checkpoint
+        # with map_location='cuda' moves these buffers onto GPU as well; move
+        # RNG buffers explicitly back to CPU before restoring generators.
+        cpu_rng=prior["rng_cpu"].cpu()
+        cuda_rng=[state.cpu() for state in prior["rng_cuda"]]
+        if cpu_rng.dtype!=torch.uint8 or any(x.dtype!=torch.uint8 for x in cuda_rng):
+            raise TypeError("Saved RNG states must be CPU torch.uint8 ByteTensors")
+        if args.device=="cuda" and len(cuda_rng)!=torch.cuda.device_count():
+            raise ValueError(f"GPU count changed: checkpoint has {len(cuda_rng)} RNG "
+                             f"states, current allocation has {torch.cuda.device_count()}")
+        torch.set_rng_state(cpu_rng)
+        if args.device=="cuda":
+            torch.cuda.set_rng_state_all(cuda_rng)
     if not args.eval_only:
         model.train()
         indices=stable_order(args.epoch,len(pairs))
