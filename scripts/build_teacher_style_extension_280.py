@@ -237,7 +237,10 @@ def allocate(group,buckets,used_global,rng):
         if len(facts)<PER_STRATUM:
             raise RuntimeError(f"Not enough candidates for {group}/{stratum}: "
                                f"only {len(facts)} canonical facts, need {PER_STRATUM}")
-        fact_degree.update(facts)
+        # Counter.update(dict) would interpret each VALUE (a record dict)
+        # as an integer count and raise TypeError. Update using fact KEYS as
+        # an iterable: each canonical fact contributes exactly one incidence.
+        fact_degree.update(facts.keys())
     slots=[(s,i) for s in
            sorted(STRATA[group],key=lambda s:(len(buckets[(group,s)]),s))
            for i in range(PER_STRATUM)]
@@ -441,6 +444,36 @@ def selftest():
         assert verify_math(prompt,answer)
     assert len(GROUPS)==7 and len(STRATA)==7 and all(len(s)==4 for s in STRATA.values())
     assert 7*4*10==280
+    # Exercise the ACTUAL allocator on fake, math-keyed records: this catches
+    # API misuse such as Counter.update(dict), which a label-only test missed.
+    group="subtract"
+    strata=STRATA[group]
+    def fake(case):
+        test_buckets=defaultdict(dict)
+        for j,sub in enumerate(strata):
+            # Feasible case has mostly distinct facts; scarce case can have
+            # the same facts across strata but not within a stratum.
+            indices=(list(range(j*12,j*12+14)) if case=="feasible"
+                     else list(range(0,12)))
+            for num in indices:
+                key=("add",str(num),str(num+1),str(2*num+1))
+                test_buckets[(group,sub)][key]={
+                    "fact_key":list(key),"category":group,
+                    "subskill":sub,"prompt":f"test_{j}_{num}",
+                    "seen_status":"seen" if num%2 else "unseen"
+                }
+        result=allocate(group,test_buckets,set(),random.Random(991))
+        assert len(result)==40
+        assert len({r["prompt"] for r in result})==40
+        for sub in strata:
+            values=[tuple(r["fact_key"]) for r in result if r["subskill"]==sub]
+            assert len(values)==10 and len(set(values))==10
+        return len({tuple(r["fact_key"]) for r in result})
+    unique_feasible=fake("feasible")
+    unique_scarce=fake("scarce")
+    assert unique_feasible==40 and unique_scarce==12
+    print("PASS allocation regression: 40 distinct prompts / 40 facts, "
+          "and 40 prompts / 12 cross-stratum reused facts")
     print("PASS Extension280: 7 original course categories × 4 strata × 10, correct gold and labels")
 
 def main():
