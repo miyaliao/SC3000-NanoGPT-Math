@@ -140,10 +140,6 @@ def run():
     })
     execute_step(3,steps,env)
     execute_step(4,steps,env)  # Reads SFT gpt.pt, never Round4/5 DPO weights!
-    if env["ckpt"]["model_args"]!=env["gpt"].config.__dict__:
-        # This guard can fail on extra internal config keys; basic checkpoint
-        # architecture compatibility is already guaranteed in Step 4.
-        pass
     expected_sft_sha=hashfile(SFT)
     directory=(RUNROOT/("_smoke_"+args.arm if args.smoke else args.arm))
     out=directory/f"epoch{args.epoch:02d}"
