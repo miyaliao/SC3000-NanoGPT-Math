@@ -27,3 +27,6 @@ dpo/experiments/round1c_incorrect/dpo.pt
 /dpo/data/round4_matched_*/
 # Avoid accidentally committing large per-epoch experiment checkpoints
 /dpo/experiments/**/dpo_epoch*.pt
+
+# Round5 generated 100k matched explanation datasets
+/dpo/data/round5_decomposition/
