@@ -443,8 +443,11 @@ def build():
         "fact_disjoint_with_existing_val_ood_extended_public_and_teacher_examples":True,
         "all_unique_prompts":True,
         "unique_fact_keys_total":len({tuple(r["fact_key"]) for r in chosen}),
-        "math_fact_reuses_between_operation_groups":
+        "math_fact_reuses_global_total":
             EXPECTED_TOTAL-len({tuple(r["fact_key"]) for r in chosen}),
+        "math_fact_reuses_between_operation_groups":
+            sum(len({tuple(r["fact_key"]) for r in chosen if r["category"]==g})
+                for g in GROUPS)-len({tuple(r["fact_key"]) for r in chosen}),
         "within_each_subskill_unique_fact_keys":True,
         "unique_facts_by_operation":{g:len({tuple(r["fact_key"]) for r in chosen
                                           if r["category"]==g}) for g in GROUPS},
