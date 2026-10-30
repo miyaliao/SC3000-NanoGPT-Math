@@ -51,19 +51,19 @@ STRATA={
     "a_times_x":[
         "unknown_1digit_known_2digit",
         "unknown_2digit_known_1digit",
-        "both_2digit_product_101_400",
+        "both_2digit_product_100_400",
         "both_2digit_product_401_999",
     ],
     "x_over_a":[
         "divisor_1digit_quotient_2digit",
         "divisor_2digit_quotient_1digit",
-        "both_2digit_product_101_400",
+        "both_2digit_product_100_400",
         "both_2digit_product_401_999",
     ],
     "a_over_x":[
         "answer_1digit_quotient_2digit",
         "answer_2digit_quotient_1digit",
-        "both_2digit_product_101_400",
+        "both_2digit_product_100_400",
         "both_2digit_product_401_999",
     ],
 }
@@ -123,7 +123,7 @@ def classify(group,prompt,answer):
         if n>=10 and multiplier<=9:
             return "unknown_2digit_known_1digit"
         if n>=10 and multiplier>=10:
-            return ("both_2digit_product_101_400" if product<=400
+            return ("both_2digit_product_100_400" if product<=400
                     else "both_2digit_product_401_999")
         return None
     if group=="x_over_a":
@@ -136,7 +136,7 @@ def classify(group,prompt,answer):
         if divisor>=10 and quotient<=9:
             return "divisor_2digit_quotient_1digit"
         if divisor>=10 and quotient>=10:
-            return ("both_2digit_product_101_400" if product<=400
+            return ("both_2digit_product_100_400" if product<=400
                     else "both_2digit_product_401_999")
         return None
     if group=="a_over_x":
@@ -149,7 +149,7 @@ def classify(group,prompt,answer):
         if n>=10 and quotient<=9:
             return "answer_2digit_quotient_1digit"
         if n>=10 and quotient>=10:
-            return ("both_2digit_product_101_400" if product<=400
+            return ("both_2digit_product_100_400" if product<=400
                     else "both_2digit_product_401_999")
         return None
     raise ValueError(group)
