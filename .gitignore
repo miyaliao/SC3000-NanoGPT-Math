@@ -36,3 +36,6 @@ dpo/experiments/round1c_incorrect/dpo.pt
 
 # Round6 20 epoch checkpoints, optimizer snapshots and evaluations
 /dpo/experiments/round6_from_sft/
+
+# Same-question prior-year public blind benchmark inference outputs
+/dpo/experiments/prior_year_blind_*/
