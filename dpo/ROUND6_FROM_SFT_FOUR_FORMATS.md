@@ -26,16 +26,15 @@ The **D arm's other 83,729 rows are identical to C** (which are, in turn, identi
 - **Five complete epochs** per arm, with 1 GPU job / epoch, chained using Slurm `afterok`. At each epoch checkpoint preserve model weights, AdamW moments, LR scheduler and Torch CPU/CUDA RNG. The sample order is a deterministic SHA256-verifiable permutation of the same 100k indices each epoch across all arms (not reused Round3's historical shuffling).
 - Every epoch evaluates the same fixed **Round3 Val768**, **Old OOD256**, **Round4 Extended Val384**, and **Train Probe256** (the last may contain repeated prompts). The sealed **Round3 Test768 is never loaded, evaluated, or used for model selection**.
 - All four arms evaluated with the SAME period/newline greedy stop and `max_new_tokens=160`. This differs from Round3/4/5's earlier 80-character limit; historical comparisons remain descriptive unless re-evaluated under identical limits.
-- Every evaluation reports two numerical metrics:
-  1. **strict_accuracy**: model's response begins `The answer is <integer>`; identical first-answer scoring protocol to previous Round3/4/5 saved results.
-  2. **final_accuracy**: additionally accepts complete, recognizable `<validly patterned steps> so The answer is N.` after the steps. Mathematical correctness of steps is scored separately as `valid_calculation`; the final number can be correct even when arithmetic steps are wrong, so use both.
-- The strict metric is **NOT** a confirmed imitation of the lecturer/TA hidden evaluation code. A D output that is correct under final-answer metric may be unusable for the course grader. Do not select D as a submission checkpoint without verifying required answer format and end-to-end validation.
+- **ONE primary score for all four arms**: `strict_accuracy` with response beginning `The answer is <integer>`. This is the existing historical Round3/4/5 answer-extraction convention; the same scorer is used for A/B/C/D and remains unchanged throughout Round6.
+- `final_accuracy` (recognizing a complete `<steps> so The answer is N.` completion), `reason_before_answer`, and `valid_calculation` are **separate, purely exploratory diagnostics**, never substituted for primary model selection. Inspect via `python scripts/compare_round6_from_sft.py --diagnostics`; ordinary `python scripts/compare_round6_from_sft.py` reports only uniform primary metrics.
+- The instructor Notebook's Step 8 shows generating test answers but does **not** disclose the actual TA scoring/extraction code. Our historical strict evaluator is thus NOT a confirmed imitation of the hidden TA parser. If the TA uses an anywhere-in-output search for `The answer is N`, reasoning-first might be accepted, but this has NOT been verified. Do not select D as a course submission winner based only on secondary exploratory diagnostics.
 
 ### Hypotheses and decision criteria
 
 **H1 B vs A:** does removing `because` improve the first numeric answer and original course-format accuracy? Both answer-first and suitable for existing grader.
 
-**H2 D vs C:** can pre-answer steps improve final numerical correctness **relative to the same 16,271 decomposition records placed after the answer**? Compare `final_accuracy`, `strict_accuracy`, `reason_before_answer`, `valid_calculation` and format failures.
+**H2 D vs C:** can pre-answer steps improve performance under the SAME fixed primary answer-extraction scoring, relative to the 16,271 matched post-answer decompositions? Examine `final_accuracy`, `reason_before_answer`, `valid_calculation` and format failures only as supplemental diagnostics; never mix these with the primary rank.
 
 **Primary:** the **128 fixed direct large-product** questions within Extended Val384 (64 multiply and 64 x_over_a). Secondary: entire Extended Val384; guardrails: Val768 and Old OOD256. Use matched per-item-only correctness comparisons, not merely different datasets' average accuracy.
 
@@ -116,7 +115,7 @@ After each full set of four arm epochs (or when any matching epochs are availabl
 python scripts/compare_round6_from_sft.py
 ```
 
-It rejects unmatched LR, seed, data, model origin, scoring budgets, epoch settings or question order. Prints A/B and C/D paired scores for each fixed validation split and direct-large-product target subset.
+It rejects unmatched LR, seed, data, model origin, scoring budgets, epoch settings or question order. The default report ranks A/B/C/D exclusively using the SAME historical strict parser for every arm and every split. For optional, clearly labeled research diagnostics, append `--diagnostics`.
 
 Final model files will be:
 ```text
