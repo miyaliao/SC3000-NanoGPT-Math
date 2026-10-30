@@ -32,7 +32,7 @@ This isolates the **added benefit of model-generated hard Rejected vs refusal**,
 
 ## BLOCKING prerequisite: freeze Teacher-style 400 benchmark FIRST
 
-The user chose to create a fixed instructor-style test benchmark (400 questions across 5 categories), inspired by ICLR 2024's digit/carry balancing. The mining script will now **refuse** to mine if `dpo/benchmarks/teacher_style_400_v1/{questions.json,manifest.json}` does not exist. It verifies the question SHA and adds ALL 400 mathematical fact keys to the excluded list—even ones that historically appeared in older training. This ensures new self-mined question rehearsal and nearby number variants never contaminate the frozen benchmark.
+The user chose to create a fixed instructor-style test benchmark (400 questions across 5 categories), inspired by ICLR 2024's digit/carry balancing. The mining script will now **refuse** to mine if `dpo/benchmarks/teacher_style_400_v1/{questions.json,manifest.json}` does not exist. It verifies the question SHA and adds ALL mathematical fact keys represented by the 400 prompts to the excluded list—even ones that historically appeared in older training. This ensures new self-mined question rehearsal and nearby number variants never contaminate the frozen benchmark.
 
 Run the CPU `--self-test-only`, `--audit-only`, `--freeze` and `--check-frozen` steps in [TEACHER_STYLE_400_BENCHMARK.md](TEACHER_STYLE_400_BENCHMARK.md) and commit the frozen data before running Round8 GPU mining.
 
