@@ -29,27 +29,32 @@ def read_predictions(arm, epoch, split):
     rows=json.loads(file.read_text(encoding="utf-8"))
     if len(rows)!=SPLITS[split]:
         raise ValueError(f"Unexpected question count {file}: {len(rows)}")
-    mapping={r["prompt"]:r for r in rows}
-    if len(mapping)!=len(rows):
-        raise ValueError(f"Duplicate prompts in {file}")
+    # train_probe_256 is sampled from a 100k-row dataset with deliberate
+    # repeated prompts. Rows are evaluated in the SAME fixed source order for
+    # each arm/epoch. Do not collapse duplicate prompts into a dictionary.
     for r in rows:
         if str(r.get("answer")) not in ("", "None") and r["status"]=="correct":
             if r.get("prediction") is None or int(r["prediction"])!=int(r["answer"]):
                 raise ValueError(f"Incorrect 'correct' label: {file} {r['prompt']}")
-    return mapping
+    return rows
 
 
 def compare(a,b):
-    if set(a)!=set(b):
-        raise ValueError("The two evaluations did not use identical prompts")
+    if len(a)!=len(b):
+        raise ValueError("Different evaluation lengths")
     counts=Counter()
     by_category=defaultdict(Counter)
     by_digits=defaultdict(Counter)
     examples={"a_only":[],"b_only":[]}
-    for prompt in sorted(a):
-        x,y=a[prompt],b[prompt]
+    # Fixed evaluation record order is identical across arms and epochs.
+    # Position-based pairing preserves every occurrence of repeated prompts.
+    for position,(x,y) in enumerate(zip(a,b)):
+        prompt=x["prompt"]
+        if prompt!=y["prompt"]:
+            raise ValueError(f"Different prompt order at row {position}: "
+                             f"{prompt!r} vs {y['prompt']!r}")
         if str(x["answer"])!=str(y["answer"]) or x["category"]!=y["category"]:
-            raise ValueError(f"Different truth labels/category for {prompt}")
+            raise ValueError(f"Different truth labels/category at row {position}: {prompt}")
         xok=x["status"]=="correct"
         yok=y["status"]=="correct"
         key="both" if xok and yok else "a_only" if xok else "b_only" if yok else "neither"
@@ -58,13 +63,14 @@ def compare(a,b):
         by_digits[len(str(x["answer"]).lstrip("-"))][key]+=1
         if key in examples and len(examples[key])<12:
             examples[key].append({
-                "prompt":prompt,"gold":x["answer"],
+                "prompt":prompt,"row_index":position,"gold":x["answer"],
                 "a_prediction":x.get("prediction"),"b_prediction":y.get("prediction"),
                 "a_completion":x.get("completion"),"b_completion":y.get("completion"),
             })
     n=len(a)
     return {
         "n":n,
+        "unique_prompts":len({r["prompt"] for r in a}),
         "a_correct":counts["both"]+counts["a_only"],
         "b_correct":counts["both"]+counts["b_only"],
         "a_minus_b_correct":counts["a_only"]-counts["b_only"],
@@ -84,11 +90,42 @@ def compare(a,b):
     }
 
 
+
+def self_test():
+    """Verify repeated prompts are retained and alignment errors are rejected."""
+    a=[
+      {"prompt":"3+4=?","answer":"7","category":"add","status":"correct","prediction":7},
+      {"prompt":"3+4=?","answer":"7","category":"add","status":"math_error","prediction":6},
+      {"prompt":"8-2=?","answer":"6","category":"subtract","status":"correct","prediction":6},
+    ]
+    b=[
+      {"prompt":"3+4=?","answer":"7","category":"add","status":"math_error","prediction":8},
+      {"prompt":"3+4=?","answer":"7","category":"add","status":"correct","prediction":7},
+      {"prompt":"8-2=?","answer":"6","category":"subtract","status":"correct","prediction":6},
+    ]
+    r=compare(a,b)
+    assert r["n"]==3 and r["unique_prompts"]==2
+    assert r["a_correct"]==2 and r["b_correct"]==2
+    assert r["paired_outcomes"]=={"a_only":1,"b_only":1,"both":1}
+    assert r["examples"]["a_only"][0]["row_index"]==0
+    try:
+        compare(a,[b[2],b[1],b[0]])
+    except ValueError as exc:
+        assert "Different prompt order" in str(exc)
+    else:
+        raise AssertionError("Mismatched evaluation ordering accepted")
+    print("PASS: repeated train-probe prompts retained; rowwise pairing exact")
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--save",action="store_true",
                    help="Write a new, non-overwriting JSON report to results/")
+    p.add_argument("--self-test-only", action="store_true",
+                   help="CPU-only synthetic duplicate-prompt and alignment checks")
     args=p.parse_args()
+    self_test()
+    if args.self_test_only:
+        return
     cache={}
     for arm in ARMS:
         for epoch in (1,2):
@@ -97,6 +134,7 @@ def main():
 
     result={"comparing":"a=treatment, b=replay or prior treatment epoch",
             "same_prompts_required":True,
+        "paired_by":"identical source-row index; repeated train-probe prompts retained",
             "treatment_minus_replay":{},
             "treatment_epoch2_minus_epoch1":{},
             "replay_epoch2_minus_epoch1":{}}
@@ -136,8 +174,10 @@ def main():
         print(f"{name:15} {row['a_correct']:2}/{row['n']} E2 "
               f"vs {row['b_correct']:2}/{row['n']} E1; "
               f"delta={row['a_correct']-row['b_correct']:+d}")
-    print("\nNote: questions can share underlying math facts; paired per-question "
-          "counts are descriptive, not independent-sample significance tests.")
+    print("\nNote: train_probe may contain repeated prompts because its source "
+          "was sampled from repeated training rows; paired rows are retained. "
+          "Questions can share underlying math facts, so descriptive counts "
+          "are not independent-sample significance tests.")
     if args.save:
         if OUTPUT.exists():
             raise FileExistsError(f"Refusing to overwrite previous audit: {OUTPUT}")
