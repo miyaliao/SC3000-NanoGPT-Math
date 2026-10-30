@@ -40,8 +40,8 @@ OOD=ROOT/"dpo/experiments/round1c_incorrect/common_integer_val_256.json"
 
 # Errors in Round5-A were concentrated in direct large-product arithmetic.
 # Keep smaller inverse-form training to avoid losing them.
-QUOTA={"multiply":4500,"x_over_a":4500,"x_times_a":2000,
-       "a_times_x":2000,"divide":1000,"a_over_x":1000}
+QUOTA={"multiply":3750,"x_over_a":3750,"x_times_a":2250,
+       "a_times_x":2250,"divide":1500,"a_over_x":1500}
 assert sum(QUOTA.values())==15000
 
 POS_RE=re.compile(r"^(?P<prompt>.+?=\?) The answer is (?P<answer>\d+) because .+\.$")
