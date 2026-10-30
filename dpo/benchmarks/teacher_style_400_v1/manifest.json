@@ -1,0 +1,109 @@
+{
+  "version": "teacher_style_400_v1",
+  "seed": 20261030,
+  "paper": "Nayoung Lee et al., Teaching Arithmetic to Small Transformers, ICLR 2024",
+  "paper_repo": "https://github.com/lee-ny/teaching_arithmetic",
+  "note": "New SC3000 benchmark inspired by digit/carry balance; NOT paper's raw dataset",
+  "teacher_example_questions_kept_separate": true,
+  "groups": [
+    "add",
+    "multiply",
+    "divide",
+    "a_minus_x",
+    "x_times_a"
+  ],
+  "quota_per_group": 80,
+  "subskill_quota": 20,
+  "subskills": {
+    "add": [
+      "ones_carry0_tens_carry0",
+      "ones_carry0_tens_carry1",
+      "ones_carry1_tens_carry0",
+      "ones_carry1_tens_carry1"
+    ],
+    "multiply": [
+      "result_2digit_ones_carry0",
+      "result_2digit_ones_carry1",
+      "result_3digit_ones_carry0",
+      "result_3digit_ones_carry1"
+    ],
+    "divide": [
+      "quotient_1digit_divisor_even",
+      "quotient_1digit_divisor_odd",
+      "quotient_2digit_divisor_even",
+      "quotient_2digit_divisor_odd"
+    ],
+    "a_minus_x": [
+      "answer_1digit_borrow0",
+      "answer_1digit_borrow1",
+      "answer_2digit_borrow0",
+      "answer_2digit_borrow1"
+    ],
+    "x_times_a": [
+      "answer_1digit_multiplier_1digit",
+      "answer_1digit_multiplier_2digit",
+      "answer_2digit_multiplier_1digit",
+      "answer_2digit_multiplier_2digit"
+    ]
+  },
+  "selected_n": 400,
+  "by_seen_status": {
+    "add": {
+      "seen": 80
+    },
+    "multiply": {
+      "seen": 80
+    },
+    "divide": {
+      "seen": 80
+    },
+    "a_minus_x": {
+      "seen": 80
+    },
+    "x_times_a": {
+      "seen": 80
+    }
+  },
+  "total_seen": 400,
+  "total_unseen": 0,
+  "original_stable_partition": "train for ALL benchmark facts",
+  "fact_disjoint_with_existing_val_ood_extended_public_and_teacher_examples": true,
+  "all_unique_prompts": true,
+  "unique_fact_keys_total": 354,
+  "math_fact_reuses_global_total": 46,
+  "math_fact_reuses_between_operation_groups": 38,
+  "within_each_subskill_unique_fact_keys": true,
+  "unique_facts_by_operation": {
+    "add": 80,
+    "multiply": 80,
+    "divide": 72,
+    "a_minus_x": 80,
+    "x_times_a": 80
+  },
+  "math_fact_reuses_within_operation": {
+    "add": 0,
+    "multiply": 0,
+    "divide": 8,
+    "a_minus_x": 0,
+    "x_times_a": 0
+  },
+  "selection_strategy": "maximum matching first; unavoidable cross-subskill fact reuse disclosed",
+  "no_four_digit_multiplication_results": true,
+  "no_sealed_round3_test_file_read": true,
+  "source_sha256": {
+    "round3_train_meta": "165ff58d0e7011c7b15c57225dee2abef8789552a624e767ca2b23a6f296d1c7",
+    "round3_val": "037ef377a5dae8189669b88217ca95fa09c05601bac811fbbe7c52715f6f2351",
+    "round4_treatment": "ffce5bf696ddef987734b7edea58727fd0bf55f9b431814cc9dcfa81c519894e",
+    "round4_extended_val": "0718452058fe6f248b53874724cfced885a4f0572452cd6b1cb34b82e1dda944",
+    "round5_train": "ffce5bf696ddef987734b7edea58727fd0bf55f9b431814cc9dcfa81c519894e",
+    "old_ood": "f83393173cbbf73008d443a059651ca82fb360375f343bcb80a7dc8a6cb49b25",
+    "published_public_blind": "c5b8400788a3749a23779a0f7d818b6e5645ed0f1a20a96665d64614817e1e5e"
+  },
+  "new_candidate_rejections": {
+    "protected": 1305,
+    "not_original_train_partition": 1756
+  },
+  "no_future_training_on_any_of_these_400_facts": true,
+  "evaluation": "same original greedy model.py stop and strict starts-with-The answer is scoring; TA extractor unknown",
+  "questions_sha256": "c27518670be350154e9eb8d93ec7126a518c4d3cd4cf23a942649970011e4396"
+}
