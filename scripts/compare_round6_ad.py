@@ -81,11 +81,39 @@ def brief(result):
             f"(A-only={result['a_only']}; D-only={result['d_only']})")
 
 
+def self_test():
+    a=[
+      {"prompt":"2*3=?","answer":"6","category":"multiply","strict_status":"correct"},
+      {"prompt":"x/5=2,x=?","answer":"10","category":"x_over_a","strict_status":"math_error"},
+      {"prompt":"7+1=?","answer":"8","category":"add","strict_status":"correct"},
+    ]
+    d=[
+      {"prompt":"2*3=?","answer":"6","category":"multiply","strict_status":"format_failure"},
+      {"prompt":"x/5=2,x=?","answer":"10","category":"x_over_a","strict_status":"correct"},
+      {"prompt":"7+1=?","answer":"8","category":"add","strict_status":"correct"},
+    ]
+    r=paired(a,d,"strict_status")
+    assert r["n"]==3 and r["a_correct"]==2 and r["d_correct"]==2
+    assert r["a_only"]==1 and r["d_only"]==1 and r["d_minus_a"]==0
+    try:
+        paired(a,[d[1],d[0],d[2]],"strict_status")
+    except ValueError as exc:
+        assert "Different fixed question" in str(exc)
+    else:
+        raise AssertionError("Mismatched question order was accepted")
+    print("PASS: A/D paired strict scoring, per-row alignment, exclusive wins")
+
+
 def run():
     p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument("--self-test",action="store_true",
+                   help="Run synthetic paired-scoring checks without experiment files")
     p.add_argument("--diagnostics",action="store_true",
                    help="Print D secondary final-answer and step metrics separately")
     args=p.parse_args()
+    if args.self_test:
+        self_test()
+        return
     m=read(ROOT/"dpo/data/round6_from_sft/manifest.json")
     if (m["version"]!="round6_sft_four_formats_v1" or
         m["train_rows_per_arm"]!=100000 or
@@ -133,9 +161,10 @@ def run():
             key=(arm,"val")
             current=s["evaluation"]["val"]["strict_correct"]
             if key in previous:
-                print(f"  {arm} Val: E{epoch-1}={previous[key]} "
-                      f"→ E{epoch}={current} ({current-previous[key]:+d})")
-            previous[key]=current
+                prior_epoch, prior_count=previous[key]
+                print(f"  {arm} Val: E{prior_epoch}={prior_count} "
+                      f"→ E{epoch}={current} ({current-prior_count:+d})")
+            previous[key]=(epoch,current)
         if args.diagnostics:
             print("--- D REASONING DIAGNOSTICS: NOT PRIMARY MODEL ACCURACY ---")
             dsum=sd["evaluation"]["extended_val"]
