@@ -105,6 +105,8 @@ def evaluate_group(rows,expected,group):
         if status=="correct" and (pred is None or int(pred)!=int(gold)):
             raise ValueError(f"Correct label inconsistent in {group}[{i}]")
         feat=characteristic(prompt,gold,category,fact)
+        if "in_training_fact" in r:
+            feat["seen_training_fact"]=("seen" if r["in_training_fact"] else "unseen")
         result.append({"prompt":prompt,"category":category,"answer":gold,
                        "status":status,"prediction":pred,
                        "correct":status=="correct","features":feat})
@@ -113,7 +115,7 @@ def evaluate_group(rows,expected,group):
     for cat in sorted({r["category"] for r in result}):
         summaries["by_category"][cat]=summarize([r for r in result if r["category"]==cat])
     for field in ("math_family","numeric_digits","product_band","factor_pattern",
-                  "target","carry_pattern","answer_band","equation"):
+                  "target","carry_pattern","answer_band","equation","seen_training_fact"):
         values=sorted({str(r["features"][field]) for r in result if field in r["features"]})
         if not values:continue
         summaries["by_feature"][field]={
@@ -126,7 +128,7 @@ def evaluate_group(rows,expected,group):
     for category,data in summaries["by_category"].items():
         print(f"  {category:14} {data['correct']:3}/{data['n']:3} "
               f"({data['accuracy']:.1%})")
-    for name in ("target","product_band","factor_pattern","carry_pattern"):
+    for name in ("seen_training_fact","target","product_band","factor_pattern","carry_pattern"):
         if name not in summaries["by_feature"]:continue
         print(f"  - {name}:")
         for value,data in summaries["by_feature"][name].items():
