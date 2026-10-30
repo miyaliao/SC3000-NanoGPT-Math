@@ -30,3 +30,9 @@ dpo/experiments/round1c_incorrect/dpo.pt
 
 # Round5 generated 100k matched explanation datasets
 /dpo/data/round5_decomposition/
+
+# Round6 generated 4 x 100k matched preference data files
+/dpo/data/round6_from_sft/
+
+# Round6 20 epoch checkpoints, optimizer snapshots and evaluations
+/dpo/experiments/round6_from_sft/
