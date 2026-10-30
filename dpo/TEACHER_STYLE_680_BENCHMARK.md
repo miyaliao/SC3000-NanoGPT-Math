@@ -14,9 +14,9 @@ Each operation has **four subskills**, with **10 distinct prompt strings and 10 
 | `x_plus_a` | Unknown x is 1/2 digits × units-column carry yes/no | `x+17=36,x=?` |
 | `a_plus_x` | Unknown x is 1/2 digits × units-column carry yes/no | `17+x=36,x=?` |
 | `x_minus_a` | Subtrahend a is 1/2 digits × units-column borrow yes/no (x itself 2 digits) | `x-17=20,x=?` |
-| `a_times_x` | x 1 digit and known factor 2 digits; x 2 digits and known factor 1 digit; both factors 2 digits with product 101–400; both factors 2 digits with product 401–999 | `11*x=44,x=?` |
-| `x_over_a` | divisor 1 digit / quotient 2 digits; divisor 2 digits / quotient 1 digit; both factors 2 digits with product 101–400; both factors 2 digits with product 401–999 | `x/4=18,x=?` |
-| `a_over_x` | unknown divisor 1 digit / quotient 2 digits; unknown divisor 2 digits / quotient 1 digit; both factors 2 digits with product 101–400; both factors 2 digits with product 401–999 | `72/x=4,x=?` |
+| `a_times_x` | x 1 digit and known factor 2 digits; x 2 digits and known factor 1 digit; both factors 2 digits with product 100–400; both factors 2 digits with product 401–999 | `11*x=44,x=?` |
+| `x_over_a` | divisor 1 digit / quotient 2 digits; divisor 2 digits / quotient 1 digit; both factors 2 digits with product 100–400; both factors 2 digits with product 401–999 | `x/4=18,x=?` |
+| `a_over_x` | unknown divisor 1 digit / quotient 2 digits; unknown divisor 2 digits / quotient 1 digit; both factors 2 digits with product 100–400; both factors 2 digits with product 401–999 | `72/x=4,x=?` |
 
 No negative or fractional arithmetic; all multiplication-derived correct results **≤999**, no four-digit products. For the small equation classes, operands are mainly 1–2 digits. If a fact can be phrased in multiple inverse math forms, its **canonical key** is used to enforce leakage exclusions.
 
