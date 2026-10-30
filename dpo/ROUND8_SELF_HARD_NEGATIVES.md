@@ -10,14 +10,14 @@ Freeze **Round7 Replay** as current baseline and mining model (strict Val567/768
 
 It mines a deterministic stratified sample (120 unique TRAIN prompts per each of 12 math classes, max1440), retaining only model-generated WRONG **complete answer-first** statements with a numeric error and `because ... .` output. No format-only failures or correct final numbers are treated as hard negatives.
 
-For EACH actual error, derive nearby `a±1..3`, `b±1..3` variations of the same arithmetic fact and original question form. New multiplication results are constrained to **101..999**, **never >=1000**. New addition facts stay bounded. Every new variant:
+For EACH actual error, derive nearby `a±1..3`, `b±1..3` variations of the original TRAIN question while retaining its question type. Multiplication results are constrained to **101..999**, **never >=1000**. Additions stay bounded. Variations are *new exercises*, not necessarily previously-unseen mathematical facts: re-practicing an existing TRAIN fact is acceptable. Every variant:
 - belongs to the original `stable_split(fact_key,42)=='train'`
-- is NOT already present in previous original training math facts
+- must change the mathematical fact of the source wrong TRAIN exercise (even though it may overlap OTHER training facts)
 - shares NO mathematical fact with any of fixed Val768/Old OOD256/Extended384
 - shares NO mathematical fact with 61+41 public-year benchmark questions (these are loaded ONLY as an exclusion list, never as seeds)
 - is generated from original TRAIN question and verified via `parse_relation`
 
-The frozen model then also generates completions for the variants. Only variants actually answered wrong by that model are retained as new hard-negative examples. **The sealed Round3 independent Test file is never opened.**
+The frozen model then also generates completions for the variants. Only variants actually answered wrong by that model are retained as new hard-negative examples. We also report how many changed-number facts were already present in other source TRAIN rows. **The sealed Round3 independent Test file is never opened.**
 
 ## Crucial controlled experiment
 
