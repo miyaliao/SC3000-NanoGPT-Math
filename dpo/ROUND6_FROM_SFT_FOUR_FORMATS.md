@@ -69,17 +69,29 @@ squeue -u "$USER"
 
 Read the resulting `round6_smoke_*.out` and `.err` to confirm full success. Smoke writes only to `dpo/experiments/round6_from_sft/_smoke_decomposition_before/epoch01/`.
 
-## Full 4 x 5 epochs: submit per arm
+## Staged pilot first: run epoch 1 for each arm
 
 ```bash
-bash scripts/submit_round6_arm.sh original
-bash scripts/submit_round6_arm.sh answer_only
-bash scripts/submit_round6_arm.sh decomposition_after
-bash scripts/submit_round6_arm.sh decomposition_before
+sbatch scripts/round6_epoch.sbatch original 1
+sbatch scripts/round6_epoch.sbatch answer_only 1
+sbatch scripts/round6_epoch.sbatch decomposition_after 1
+sbatch scripts/round6_epoch.sbatch decomposition_before 1
 squeue -u "$USER"
 ```
 
-**TC1 is 1 GPU/user:** four arms may queue, not run simultaneously. Each command submits five `afterok`-dependent epoch jobs for one arm. Do not submit 20 jobs if there is a cluster queued-job limit; submit one arm at a time as allowed. `#SBATCH --time=04:00:00` is a per-epoch walltime request, not a guaranteed time estimate. Each epoch has its own nonoverwriting directory. If one epoch fails, later epochs will NOT run automatically.
+After all four Epoch-1 jobs are COMPLETE, inspect `python scripts/compare_round6_from_sft.py`. Confirm that the new `decomposition_before` arm actually emits `reason_before_answer` completions and their final arithmetic is readable; a near-zero rate may be a sign of format inertia even from SFT, not necessarily an arithmetic-learning failure.
+
+## Continue epochs 2–5 after the four-arm pilot
+
+```bash
+bash scripts/submit_round6_arm.sh original 2
+bash scripts/submit_round6_arm.sh answer_only 2
+bash scripts/submit_round6_arm.sh decomposition_after 2
+bash scripts/submit_round6_arm.sh decomposition_before 2
+squeue -u "$USER"
+```
+
+**TC1 is 1 GPU/user:** four arms may queue, not run simultaneously. Each command submits the remaining `afterok`-dependent epoch jobs for one arm, and verifies the immediately preceding epoch was fully evaluated. For a full run without a staged pilot, omit the final `2` to submit epochs 1–5. Avoid submitting all 20 jobs if the cluster has queued-job limits. `#SBATCH --time=04:00:00` is a per-epoch walltime request, not a guaranteed time estimate. Each epoch has its own nonoverwriting directory. If one epoch fails, later epochs will NOT run automatically.
 
 For manual single job:
 
