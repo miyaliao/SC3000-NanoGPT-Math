@@ -51,3 +51,7 @@ dpo/experiments/round1c_incorrect/dpo.pt
 # Teacher-style 400 benchmark frozen questions+manifest ARE tracked;
 # only inference outputs are ignored.
 /dpo/experiments/teacher_style_400_v1_eval/
+
+# Teacher-style 680: Core400 and Extension280 frozen files are tracked;
+# only model predictions/summaries are ignored.
+/dpo/experiments/teacher_style_680_v1_eval/
