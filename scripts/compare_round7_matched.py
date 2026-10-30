@@ -8,6 +8,10 @@ from __future__ import annotations
 import json
 from collections import Counter
 from pathlib import Path
+import sys
+
+sys.path.insert(0,str(Path(__file__).resolve().parent))
+from generate_round1 import parse_relation
 
 ROOT=Path(__file__).resolve().parents[1]
 BASE=ROOT/"dpo/experiments"
@@ -41,6 +45,36 @@ def paired(a,b,direct=False):
         c["both_wrong"]+=not(ac or bc)
     if direct and c["n"]!=128:raise RuntimeError("Expected direct 128 subset")
     return dict(c)
+
+def report_product_bands(control, treatment, split):
+    """Read-only paired accuracy by canonical product magnitude."""
+    if split not in ("val","old_ood","extended_val"):return
+    bands={
+        "<=100":[], "101-400":[], "401-999":[],
+        "1000-4999":[], ">=5000":[]
+    }
+    for i,(a,b) in enumerate(zip(control,treatment)):
+        if a["prompt"]!=b["prompt"] or a["answer"]!=b["answer"]:
+            raise RuntimeError(f"Unaligned split at index {i}")
+        fact=parse_relation(a["prompt"],str(a["answer"]))
+        if fact[0]!="mul":continue
+        product=int(fact[3])
+        band=("<=100" if product<=100 else "101-400" if product<=400 else
+              "401-999" if product<=999 else "1000-4999" if product<=4999
+              else ">=5000")
+        bands[band].append((a,b))
+    print("  by canonical multiplication product range (same questions):")
+    for name,rows in bands.items():
+        if not rows:continue
+        pair=paired([p[0] for p in rows],[p[1] for p in rows])
+        replay=pair["replay_correct"]
+        target=pair["targeted_correct"]
+        print(f"    {name:10} N={pair['n']:3} "
+              f"replay={replay:3}/{pair['n']} "
+              f"target={target:3}/{pair['n']} "
+              f"TARGET-REPLAY={target-replay:+d} "
+              f"(replay-only={pair['replay_only']}, targeted-only={pair['targeted_only']})")
+
 
 def run():
     files={a:BASE/f"round7_{a}"/"summary.json" for a in ARMS}
@@ -95,6 +129,7 @@ def run():
         print("  by category TARGET - REPLAY:",
               " ".join(f"{c}={bycat_new[c]-bycat[c]:+d}"
                        for c in sorted(bycat.keys()|bycat_new.keys())))
+        report_product_bands(data["replay"],data["targeted"],split)
     print("No public Blind61/41 or sealed independent test read.")
     print("The matched targeted-control gap, not targeted-vs-Round5 alone, "
           "is the main estimate of whether curriculum helped.")
