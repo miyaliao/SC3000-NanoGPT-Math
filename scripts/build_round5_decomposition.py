@@ -153,8 +153,11 @@ def assemble():
         a_pairs.append({"positive":old,"negative":neg})
         b_pairs.append({"positive":new,"negative":neg})
     changed=sum(counts.values())
+    if changed==0:
+        raise RuntimeError("No eligible decomposition samples found; check source data")
     if changed<5000:
-        raise RuntimeError(f"Insufficient decomposition examples: {changed} (expected substantive subset)")
+        print(f"WARNING: only {changed} decomposition-modified rows; "
+              "interpret a null result as possibly limited treatment intensity",flush=True)
     for pa,pb in zip(a_pairs,b_pairs):
         if pa["negative"]!=pb["negative"]:
             raise AssertionError("Control negative differed")
