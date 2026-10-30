@@ -54,22 +54,25 @@ def verify_data(arm):
                         ("decomposition",ROOT/"dpo/data/round5_decomposition/decomposition_pairs.json")):
         if hashfile(path)!=m["source_sha256"][source]:
             raise ValueError("Round5 upstream training dataset modified")
-    path=DATA/f"{arm}_pairs.json"
-    if hashfile(path)!=m["file_sha256"][arm]:
+    pair_path=DATA/f"{arm}_pairs.json"
+    if hashfile(pair_path)!=m["file_sha256"][arm]:
         raise ValueError("Round6 training pair SHA256 mismatch")
     if not SFT.exists():raise FileNotFoundError(SFT)
     source_manifest=read(R3/"manifest.json")
     round4_manifest=read(R4/"manifest.json")
-    for name,(path,num) in SPLITS.items():
+    for name,(eval_path,expected_n) in SPLITS.items():
         if name=="old_ood":
             expected=round4_manifest["source_sha256"]["old_val_sha256"]
         elif name=="extended_val":
             expected=round4_manifest["file_sha256"]["extension_val"]
         else:
             expected=source_manifest["sha256"]["val" if name=="val" else "train_probe"]
-        if hashfile(path)!=expected:
-            raise ValueError(f"Frozen evaluation file changed: {path}")
-    return m,path
+        if hashfile(eval_path)!=expected:
+            raise ValueError(f"Frozen evaluation file changed: {eval_path}")
+    # NEVER return the path of the last validation split here.
+    if pair_path!=DATA/f"{arm}_pairs.json":
+        raise AssertionError("Training source path changed during validation checks")
+    return m,pair_path
 
 
 def stable_order(epoch,n):
@@ -117,8 +120,11 @@ def run():
     if args.lr<=0 or args.batch_size<=0 or args.max_new_tokens<=0:p.error("Invalid hyperparameters")
     if args.eval_only and args.check_only:p.error("Choose check-only or eval-only, not both")
     manifest,path=verify_data(args.arm)
+    if path != DATA/f"{args.arm}_pairs.json":
+        raise AssertionError(f"Round6 expected training pairs, got {path}")
     pairs=read(path)
-    if len(pairs)!=100000:raise ValueError("Wrong full training rows")
+    if len(pairs)!=manifest["train_rows_per_arm"]:
+        raise ValueError(f"Wrong full training rows: got {len(pairs)} from {path}")
     if args.smoke:pairs=pairs[:128]
     print(f"PASS Round6 arm={args.arm} epoch={args.epoch}/5 "
           f"rows={len(pairs)} source={hashfile(path)[:16]}",flush=True)
