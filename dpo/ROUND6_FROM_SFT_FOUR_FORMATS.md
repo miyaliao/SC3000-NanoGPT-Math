@@ -1,6 +1,49 @@
 # Round 6 — Four Output Formats, Fair SFT Initialization
 
-**Current status:** code committed. Data creation, TC1 CPU checks, GPU smoke, and all training are still to be run by the user. Old Round3/4/5 experiments are kept immutable.
+**Current status, 2026-10-30:** all FOUR arms completed E1/E2. The user has now elected to STOP B (`answer_only`) and C (`decomposition_after`) at E2, preserving their existing results and checkpoints, and to CONTINUE ONLY A (`original`) and D (`decomposition_before`) to E5. Old Round3/4/5 experiments remain immutable. The original four-arm protocol below documents E1/E2, but the active follow-up is the two-arm A/D continuation described immediately below.
+
+## ACTIVE: A/D-only continuation after Epoch 2
+
+**Already completed E2:** A Val180/768, Extended84/384, OOD24/256 and Direct16/128; D Val174/768, Extended58/384, OOD14/256 and Direct3/128, all under the same strict historical answer-first score. D's separate exploratory final-answer 79/384 (24/128 direct) does NOT replace its primary 58/384 (3/128 direct); actual TA extraction remains unknown. D also produced 17 fully verified arithmetic chains on E2, compared with 0 at E1.
+
+Update from GitHub:
+
+```bash
+cd ~/NanoGPT-Math
+git pull --ff-only origin main
+source .venv/bin/activate
+python scripts/compare_round6_ad.py --self-test
+python scripts/compare_round6_ad.py
+```
+
+**Submit only two E3 jobs (if not already submitted or running):**
+
+```bash
+squeue -u "$USER"
+sbatch scripts/round6_epoch.sbatch original 3
+sbatch scripts/round6_epoch.sbatch decomposition_before 3
+```
+
+TC1 allows **at most two submitted jobs per user**, only **one GPU running**. Never use the old `submit_round6_arm.sh` for multi-epoch queuing here; it attempts 3–5 jobs and will exceed QoS limits. Once BOTH E3 jobs have completed successfully (check `epoch_summary.json` and `sacct`), inspect:
+
+```bash
+python scripts/compare_round6_ad.py
+python scripts/audit_round6_reasoning_outputs.py --epoch 3
+```
+
+Repeat exactly two jobs for E4, then E5, only after the preceding epoch's summary exists in BOTH arms:
+
+```bash
+sbatch scripts/round6_epoch.sbatch original 4
+sbatch scripts/round6_epoch.sbatch decomposition_before 4
+# After both E4 jobs finish and produce summaries:
+sbatch scripts/round6_epoch.sbatch original 5
+sbatch scripts/round6_epoch.sbatch decomposition_before 5
+```
+
+**Main comparison:** strict fixed `The answer is <integer>`-at-start scorer applied IDENTICALLY to both A and D on Val768, OOD256, Extended384 and direct-product128. Run `python scripts/compare_round6_ad.py --diagnostics` only for explicitly SEPARATE exploratory metrics on D (final answer after reasoning, correct arithmetic steps). No change to checkpoints, Loss, dataset, or sealed Test. A is the better course-grading candidate so far, D is the investigation arm. A-vs-D bundles decomposition position and content; without continuing C one cannot causally isolate positioning.
+
+---
 
 ## Why start over at SFT?
 
@@ -68,7 +111,7 @@ squeue -u "$USER"
 
 Read the resulting `round6_smoke_*.out` and `.err` to confirm full success. Smoke writes only to `dpo/experiments/round6_from_sft/_smoke_decomposition_before/epoch01/`.
 
-## Staged pilot first: run epoch 1 for each arm
+## Historical first-round procedure (E1 already complete for all four; do NOT rerun)
 
 ```bash
 sbatch scripts/round6_epoch.sbatch original 1
@@ -78,9 +121,9 @@ sbatch scripts/round6_epoch.sbatch decomposition_before 1
 squeue -u "$USER"
 ```
 
-After all four Epoch-1 jobs are COMPLETE, inspect `python scripts/compare_round6_from_sft.py`. Confirm that the new `decomposition_before` arm actually emits `reason_before_answer` completions and their final arithmetic is readable; a near-zero rate may be a sign of format inertia even from SFT, not necessarily an arithmetic-learning failure.
+Historically, after all four Epoch-1 jobs were COMPLETE, inspect `python scripts/compare_round6_from_sft.py`. Confirm that the new `decomposition_before` arm actually emits `reason_before_answer` completions and their final arithmetic is readable; a near-zero rate may be a sign of format inertia even from SFT, not necessarily an arithmetic-learning failure.
 
-## Continue epochs 2–5 after the four-arm pilot
+## Historical four-arm follow-up plan (superseded by ACTIVE A/D section above)
 
 ```bash
 bash scripts/submit_round6_arm.sh original 2
