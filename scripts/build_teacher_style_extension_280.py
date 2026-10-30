@@ -48,12 +48,24 @@ STRATA={
     "x_plus_a":[f"answer_{n}digit_carry{c}" for n in (1,2) for c in (0,1)],
     "a_plus_x":[f"answer_{n}digit_carry{c}" for n in (1,2) for c in (0,1)],
     "x_minus_a":[f"subtrahend_{n}digit_borrow{c}" for n in (1,2) for c in (0,1)],
-    "a_times_x":[f"answer_{n}digit_multiplier_{m}digit"
-                 for n in (1,2) for m in (1,2)],
-    "x_over_a":[f"divisor_{n}digit_quotient_{m}digit"
-                for n in (1,2) for m in (1,2)],
-    "a_over_x":[f"answer_{n}digit_quotient_{m}digit"
-                for n in (1,2) for m in (1,2)],
+    "a_times_x":[
+        "unknown_1digit_known_2digit",
+        "unknown_2digit_known_1digit",
+        "both_2digit_product_101_400",
+        "both_2digit_product_401_999",
+    ],
+    "x_over_a":[
+        "divisor_1digit_quotient_2digit",
+        "divisor_2digit_quotient_1digit",
+        "both_2digit_product_101_400",
+        "both_2digit_product_401_999",
+    ],
+    "a_over_x":[
+        "answer_1digit_quotient_2digit",
+        "answer_2digit_quotient_1digit",
+        "both_2digit_product_101_400",
+        "both_2digit_product_401_999",
+    ],
 }
 assert len(GROUPS)==7 and all(len(STRATA[g])==4 for g in GROUPS)
 assert 7*4*10==280
@@ -105,17 +117,41 @@ def classify(group,prompt,answer):
         m=re.fullmatch(r"(\d+)\*x=(\d+),x=\?",prompt)
         if not m:raise ValueError(prompt)
         multiplier,_=map(int,m.groups())
-        return f"answer_{len(str(n))}digit_multiplier_{len(str(multiplier))}digit"
+        product=multiplier*n
+        if n<=9 and multiplier>=10:
+            return "unknown_1digit_known_2digit"
+        if n>=10 and multiplier<=9:
+            return "unknown_2digit_known_1digit"
+        if n>=10 and multiplier>=10:
+            return ("both_2digit_product_101_400" if product<=400
+                    else "both_2digit_product_401_999")
+        return None
     if group=="x_over_a":
         m=re.fullmatch(r"x/(\d+)=(\d+),x=\?",prompt)
         if not m:raise ValueError(prompt)
         divisor,quotient=map(int,m.groups())
-        return f"divisor_{len(str(divisor))}digit_quotient_{len(str(quotient))}digit"
+        product=divisor*quotient
+        if divisor<=9 and quotient>=10:
+            return "divisor_1digit_quotient_2digit"
+        if divisor>=10 and quotient<=9:
+            return "divisor_2digit_quotient_1digit"
+        if divisor>=10 and quotient>=10:
+            return ("both_2digit_product_101_400" if product<=400
+                    else "both_2digit_product_401_999")
+        return None
     if group=="a_over_x":
         m=re.fullmatch(r"(\d+)/x=(\d+),x=\?",prompt)
         if not m:raise ValueError(prompt)
         _,quotient=map(int,m.groups())
-        return f"answer_{len(str(n))}digit_quotient_{len(str(quotient))}digit"
+        product=n*quotient
+        if n<=9 and quotient>=10:
+            return "answer_1digit_quotient_2digit"
+        if n>=10 and quotient<=9:
+            return "answer_2digit_quotient_1digit"
+        if n>=10 and quotient>=10:
+            return ("both_2digit_product_101_400" if product<=400
+                    else "both_2digit_product_401_999")
+        return None
     raise ValueError(group)
 
 def examples():
@@ -140,17 +176,17 @@ def examples():
                 yield "x_minus_a",f"x-{a}={b},x=?",str(x)
     # Both a*x=b and x/a=b are elementary multiplication relations;
     # limit the result to <=999 for all multiplication-derived cases.
-    for multiplier in range(2,21):
+    for multiplier in range(2,41):
         for x in range(1,80):
             result=multiplier*x
             if result<=999:
                 yield "a_times_x",f"{multiplier}*x={result},x=?",str(x)
-    for divisor in range(2,21):
+    for divisor in range(2,41):
         for quotient in range(1,80):
             result=divisor*quotient
             if result<=999:
                 yield "x_over_a",f"x/{divisor}={quotient},x=?",str(result)
-    for quotient in range(2,31):
+    for quotient in range(2,41):
         for x in range(1,80):
             numerator=x*quotient
             if numerator<=999:
@@ -166,6 +202,11 @@ def make_buckets(seen,protected):
         if stable_split(fact,PARTITION_SEED)!="train":
             rejected["original_split_not_train"]+=1;continue
         stratum=classify(category,prompt,answer)
+        if stratum is None:
+            # Both multiplication factors are single-digit. This tiny fact
+            # universe is heavily represented by frozen Core400 and is not
+            # used to pad new independent extension categories.
+            continue
         if stratum not in STRATA[category]:
             raise RuntimeError(f"Unrecognized stratum {category}/{stratum}")
         if not verify_math(prompt,answer):
@@ -391,7 +432,7 @@ def selftest():
         ("x_plus_a","x+17=36,x=?","19"):"answer_2digit_carry1",
         ("a_plus_x","17+x=36,x=?","19"):"answer_2digit_carry1",
         ("x_minus_a","x-17=20,x=?","37"):"subtrahend_2digit_borrow0",
-        ("a_times_x","11*x=44,x=?","4"):"answer_1digit_multiplier_2digit",
+        ("a_times_x","11*x=44,x=?","4"):"unknown_1digit_known_2digit",
         ("x_over_a","x/4=18,x=?","72"):"divisor_1digit_quotient_2digit",
         ("a_over_x","72/x=4,x=?","18"):"answer_2digit_quotient_1digit"
     }
