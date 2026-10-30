@@ -61,8 +61,10 @@ def main():
         sha(BENCH)!=manifest["questions_sha256"]):
         raise RuntimeError("Frozen benchmark data SHA mismatch or wrong size")
     from generate_round1 import parse_relation,stable_split
-    if len({tuple(r["fact_key"]) for r in rows})!=400:
-        raise RuntimeError("Duplicated mathematical facts")
+    if len({r["prompt"] for r in rows})!=400:
+        raise RuntimeError("Duplicate benchmark prompts")
+    if len({tuple(r["fact_key"]) for r in rows})!=manifest["unique_fact_keys_total"]:
+        raise RuntimeError("Benchmark canonical math-fact count changed")
     for row in rows:
         k=parse_relation(row["prompt"],str(row["answer"]))
         if k!=tuple(row["fact_key"]) or stable_split(k,42)!="train":
