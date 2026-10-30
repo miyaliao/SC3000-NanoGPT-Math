@@ -87,7 +87,7 @@ def run():
               "lr","epochs","batch_size","updates","loss","smoke")
     for name in protocol:
         vals=[summaries[a][name] for a in ARMS]
-        if vals[0]!=vals[1]:raise RuntimeError(f"Unmatched Round7 {name}: {vals}")
+        if vals[0]!=vals[1]:raise RuntimeError(f"Unmatched Round8 {name}: {vals}")
     if summaries["control"]["smoke"] or summaries["hardneg"]["smoke"]:
         raise RuntimeError("Do not compare smoke pilot against full train")
     base={
@@ -103,7 +103,7 @@ def run():
     for split,n in SPLITS:
         data={}
         for a in ARMS:
-            path=BASE/f"round7_{a}"/f"{split}_predictions.json"
+            path=BASE/f"round8_{a}"/f"{split}_predictions.json"
             data[a]=read(path)
             if len(data[a])!=n:raise RuntimeError(f"Unexpected {split} size")
             recomputed=sum(r["status"]=="correct" for r in data[a])
@@ -133,7 +133,7 @@ def run():
                        for c in sorted(bycat.keys()|bycat_new.keys())))
         report_product_bands(data["control"],data["hardneg"],split)
     print("No public Blind61/41 or sealed independent test read.")
-    print("The matched hardneg-control gap, not hardneg-vs-Round5 alone, "
+    print("The matched HARDNEG-CONTROL gap, not either arm vs old Replay alone, "
           "tests the added value of the model's own wrong Rejected completions.")
 
 if __name__=="__main__":
