@@ -104,7 +104,7 @@ def examples():
     for divisor in range(2,10):
         for quotient in range(1,100):
             dividend=divisor*quotient
-            if 10<=dividend<=99:
+            if 1<=dividend<=99:
                 yield "divide",f"{dividend}/{divisor}=?",str(quotient)
     for known in range(20,100):
         for result in range(10,known):
@@ -201,7 +201,14 @@ def candidates(seen,protected):
     return buckets,rejection
 
 def select(pool,used,rng):
-    filtered=[r for r in pool if tuple(r["fact_key"]) not in used]
+    # Addition and multiplication can appear in commuted input forms.
+    # They represent ONE fact: never choose both orientations.
+    unique={}
+    for r in pool:
+        k=tuple(r["fact_key"])
+        if k not in used:
+            unique.setdefault(k,r)
+    filtered=list(unique.values())
     seen=[r for r in filtered if r["seen_status"]=="seen"]
     unseen=[r for r in filtered if r["seen_status"]=="unseen"]
     rng.shuffle(seen);rng.shuffle(unseen)
