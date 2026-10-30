@@ -108,8 +108,11 @@ def load_train_only():
         sha(TEACHER_BENCH)!=teacher_manifest["questions_sha256"]):
         raise RuntimeError("Frozen teacher-style 400 benchmark SHA mismatch")
     teacher_rows=read(TEACHER_BENCH)
-    if len(teacher_rows)!=400 or len({tuple(r["fact_key"]) for r in teacher_rows})!=400:
-        raise RuntimeError("Incorrect frozen benchmark 400 unique facts")
+    if (len(teacher_rows)!=400 or
+        len({r["prompt"] for r in teacher_rows})!=400 or
+        len({tuple(r["fact_key"]) for r in teacher_rows})!=
+            teacher_manifest["unique_fact_keys_total"]):
+        raise RuntimeError("Incorrect frozen benchmark prompt/fact counts")
     teacher_facts=set()
     for r in teacher_rows:
         key=parse_relation(r["prompt"],str(r["answer"]))
