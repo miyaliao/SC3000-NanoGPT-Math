@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Round8 same-positives hard-negative comparison, one Course Loss epoch.
 
-Both arms start EXACT same frozen Round8 Replay checkpoint, see EXACT SAME
+Both arms start EXACT same frozen Round7 Replay checkpoint, see EXACT SAME
 100k positive responses, same order and hyperparameters. CONTROL has old
 refusal negatives; HARDNEG uses actual frozen-model wrong completions on a
 small subset of TRAIN-only examples and nearby bounded number variants.
@@ -51,7 +51,7 @@ def verify(arm):
     if hashfile(src)!=m["file_sha256"][arm]:
         raise RuntimeError("Round8 training arm SHA mismatch")
     if not BASE.is_file() or hashfile(BASE)!=m["base_sha256"]:
-        raise RuntimeError("Frozen Round8 Replay initial checkpoint missing or changed")
+        raise RuntimeError("Frozen Round7 Replay initial checkpoint missing or changed")
     source_m=json.loads((SOURCE/"manifest.json").read_text(encoding="utf-8"))
     old_m=json.loads((ROUND3/"manifest.json").read_text(encoding="utf-8"))
     for name,path,expected in (
