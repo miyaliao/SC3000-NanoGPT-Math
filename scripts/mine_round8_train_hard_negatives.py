@@ -34,6 +34,8 @@ OOD=ROOT/"dpo/experiments/round1c_incorrect/common_integer_val_256.json"
 PUBLIC=ROOT/"dpo/reference_2025_blind_sets.json"
 TEACHER_BENCH=ROOT/"dpo/benchmarks/teacher_style_400_v1/questions.json"
 TEACHER_MANIFEST=ROOT/"dpo/benchmarks/teacher_style_400_v1/manifest.json"
+EXT_BENCH=ROOT/"dpo/benchmarks/teacher_style_extension_280_v1/questions.json"
+EXT_MANIFEST=ROOT/"dpo/benchmarks/teacher_style_extension_280_v1/manifest.json"
 OUT=ROOT/"dpo/experiments/round8_hard_negative_mining_seed42"
 
 POS_RE=re.compile(r"^(?P<prompt>.+?=\?) The answer is (?P<answer>\d+) because .+\.$")
@@ -120,6 +122,34 @@ def load_train_only():
             raise ValueError("Benchmark fact corrupted")
         teacher_facts.add(key)
     protected |= teacher_facts
+    # Both benchmarks must be frozen BEFORE any further model-error mining.
+    # Protect the canonical facts (not just exact prompt spellings).
+    if not EXT_BENCH.is_file() or not EXT_MANIFEST.is_file():
+        raise FileNotFoundError(
+            "Freeze the extra 280 before Round8 mining: "
+            "python scripts/build_teacher_style_extension_280.py --freeze"
+        )
+    extension_manifest=read(EXT_MANIFEST)
+    if (extension_manifest.get("version")!="teacher_style_extension_280_v1" or
+        sha(EXT_BENCH)!=extension_manifest.get("questions_sha256") or
+        extension_manifest["core_reference"]["core_questions_sha256"]!=sha(TEACHER_BENCH) or
+        extension_manifest["core_reference"]["core_manifest_sha256"]!=sha(TEACHER_MANIFEST)):
+        raise RuntimeError("Frozen Extension280 / Core400 SHA mismatch")
+    extension_rows=read(EXT_BENCH)
+    if (len(extension_rows)!=280 or
+        len({r["prompt"] for r in extension_rows})!=280 or
+        len({tuple(r["fact_key"]) for r in extension_rows})!=
+            extension_manifest["unique_math_facts_total"]):
+        raise RuntimeError("Frozen Extension280 count or uniqueness mismatch")
+    extension_facts=set()
+    for r in extension_rows:
+        key=parse_relation(r["prompt"],str(r["answer"]))
+        if key!=tuple(r["fact_key"]):
+            raise RuntimeError("Extension280 math label or fact corrupt")
+        extension_facts.add(key)
+    if extension_facts & teacher_facts:
+        raise RuntimeError("Frozen extension overlaps core facts")
+    protected |= extension_facts
     lines=read(DATA)
     if len(lines)!=100000:
         raise RuntimeError("Expected exactly 100,000 original training preference rows")
@@ -152,6 +182,10 @@ def load_train_only():
         "teacher_400_questions_sha256":sha(TEACHER_BENCH),
         "teacher_400_manifest_sha256":sha(TEACHER_MANIFEST),
         "teacher_400_protected_fact_count":len(teacher_facts),
+        "extension_280_questions_sha256":sha(EXT_BENCH),
+        "extension_280_manifest_sha256":sha(EXT_MANIFEST),
+        "extension_280_protected_fact_count":len(extension_facts),
+        "all_680_prompts_protected":True,
         "total_original_train_facts":len(facts),
     }
 
