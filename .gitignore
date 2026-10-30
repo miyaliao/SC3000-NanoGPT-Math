@@ -43,3 +43,7 @@ dpo/experiments/round1c_incorrect/dpo.pt
 # Round7 generated TRAIN-only matched preference data and GPU outputs
 /dpo/data/round7_targeted_*/
 /dpo/experiments/round7_*/
+
+# Round8 train-only self-mined real wrong completions, numerical variants and new checkpoints
+/dpo/experiments/round8_*/
+/dpo/data/round8_hardneg_full/
