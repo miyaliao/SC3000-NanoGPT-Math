@@ -30,6 +30,12 @@ Old training Replay fills remaining rows. Errors and variants can each occupy **
 
 This isolates the **added benefit of model-generated hard Rejected vs refusal**, holding difficulty targeting and number-variation Chosen examples constant. It does **not** independently isolate augmentation from continuing regular Replay: base Round7 Replay is a historical reference, not a matched extra third arm. Because the course Loss uses *full-sequence mean log-probabilities*, differing Rejected lengths/format may influence this experiment; report this as a methodological limitation and consider completion-only loss only as a separate follow-up controlled experiment, not mix it in this one.
 
+## BLOCKING prerequisite: freeze Teacher-style 400 benchmark FIRST
+
+The user chose to create a fixed instructor-style test benchmark (400 questions across 5 categories), inspired by ICLR 2024's digit/carry balancing. The mining script will now **refuse** to mine if `dpo/benchmarks/teacher_style_400_v1/{questions.json,manifest.json}` does not exist. It verifies the question SHA and adds ALL 400 mathematical fact keys to the excluded list—even ones that historically appeared in older training. This ensures new self-mined question rehearsal and nearby number variants never contaminate the frozen benchmark.
+
+Run the CPU `--self-test-only`, `--audit-only`, `--freeze` and `--check-frozen` steps in [TEACHER_STYLE_400_BENCHMARK.md](TEACHER_STYLE_400_BENCHMARK.md) and commit the frozen data before running Round8 GPU mining.
+
 ## Step 1 — CPU self-test, then ONE GPU mining job
 
 ```bash
