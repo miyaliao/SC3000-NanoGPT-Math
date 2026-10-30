@@ -200,50 +200,133 @@ def candidates(seen,protected):
         })
     return buckets,rejection
 
-def select(pool,used_global,used_in_group,rng):
-    """Prefer globally distinct facts; permit cross-template fact reuse if needed.
+def select_group(group,buckets,used_global,rng):
+    """Jointly allocate 20 distinct facts to each of a group's four subskills.
 
-    The instructor explicitly tests DIFFERENT equation forms of the SAME math
-    relation. Within each operation group every fact is unique, but globally
-    some facts may naturally recur across two different operation families.
-    The manifest quantifies this; never claim 400 globally independent facts.
+    Greedy, one-subskill-at-a-time selection can consume the same math fact in
+    two neighboring strata. For example 8*7=56 could appear as 56/7=8 or
+    56/8=7, across odd/even divisor groups. A bipartite augmenting-path
+    matching reassigns previously chosen facts so a feasible 4x20 solution is
+    found instead of failing due to the order of sampling.
+
+    Historical Seen/Unseen is a preference, NOT a hard quota. Never invent
+    missing unseen facts just to force 10/10. Preserve 400 distinct prompts
+    and distinct canonical facts WITHIN each operation group.
     """
+    subs=STRATA[group]
+    # Within each subskill multiple surface variants can represent one fact.
+    # Keep ONE representative per (subskill,fact_key) deterministically.
+    per_sub={}
+    for sub in subs:
+        rows=list(buckets[(group,sub)])
+        rng.shuffle(rows)
+        unique={}
+        for row in rows:
+            unique.setdefault(tuple(row["fact_key"]),row)
+        per_sub[sub]=unique
+        if len(unique)<SUBSKILL:
+            counts=Counter(x["seen_status"] for x in unique.values())
+            raise RuntimeError(
+                f"{group}/{sub}: only {len(unique)} unique mathematical facts "
+                f"available, fewer than {SUBSKILL}; Seen/Unseen={dict(counts)}."
+            )
+
+    fact_degree=Counter()
+    for unique in per_sub.values():
+        fact_degree.update(unique.keys())
+
+    # Give scarce strata first access and minimize overlap where possible.
+    # The augmenter may subsequently move any selected fact to free a
+    # constrained slot; there is NO irreversible greedy reservation.
+    sub_order=sorted(subs,key=lambda sub:(len(per_sub[sub]),sub))
+    slot_order=[(sub,i) for sub in sub_order for i in range(SUBSKILL)]
+    edges={}
+    for sub,i in slot_order:
+        keys=list(per_sub[sub])
+        rng.shuffle(keys)
+        # Prefer Seen in first 10 slots, Unseen in last 10. Scarcity of the
+        # other label is allowed; the output reports actual counts.
+        preferred="seen" if i<SUBSKILL//2 else "unseen"
+        keys.sort(key=lambda k:(
+            0 if per_sub[sub][k]["seen_status"]==preferred else 1,
+            fact_degree[k],
+            0 if k not in used_global else 1,
+        ))
+        edges[(sub,i)]=keys
+
+    owner={}      # canonical math fact -> slot holding it
+    assignment={} # slot -> canonical math fact
+
+    def augment(slot,visited):
+        for key in edges[slot]:
+            if key in visited:
+                continue
+            visited.add(key)
+            previous_owner=owner.get(key)
+            if previous_owner is None or augment(previous_owner,visited):
+                owner[key]=slot
+                assignment[slot]=key
+                return True
+        return False
+
+    for slot in slot_order:
+        if not augment(slot,set()):
+            sub=slot[0]
+            availability={s:len(per_sub[s]) for s in subs}
+            counts={s:dict(Counter(r["seen_status"] for r in per_sub[s].values()))
+                    for s in subs}
+            raise RuntimeError(
+                f"{group}: mathematically impossible or insufficient "
+                f"fact-disjoint 4x{SUBSKILL} stratification at {sub}. "
+                f"Unique fact candidates={availability}, "
+                f"Seen/Unseen candidates={counts}. "
+                "Do NOT weaken anti-leakage constraints or add duplicates."
+            )
+
+    result=[]
+    for sub in subs:
+        rows=[per_sub[sub][assignment[(sub,i)]] for i in range(SUBSKILL)]
+        if len({tuple(x["fact_key"]) for x in rows})!=SUBSKILL:
+            raise RuntimeError(f"Matching produced duplicate facts in {group}/{sub}")
+        result.extend(rows)
+    if len(result)!=PER_GROUP or len({tuple(x["fact_key"]) for x in result})!=PER_GROUP:
+        raise RuntimeError(f"Joint matching failed {group} canonical fact uniqueness")
+    return result
+
+
+def test_matching():
+    """A tiny Hall-tight overlap example where naive greedy can fail."""
+    # A has 29 candidates, B has 30, overlap 19 and union exactly 40.
+    # Their 20+20 matching must use all 40 unique facts.
+    fake={}
+    subs=("A","B")
+    def make(i):
+        return {"fact_key":["mul",str(i),"2",str(i*2)],
+                "seen_status":"seen" if i%2 else "unseen",
+                "prompt":str(i)}
+    fake[("T","A")]=[make(i) for i in range(29)]
+    fake[("T","B")]=[make(i) for i in list(range(19))+list(range(29,40))]
     unique={}
-    for r in pool:
-        k=tuple(r["fact_key"])
-        if k not in used_in_group:
-            unique.setdefault(k,r)
-    pool=list(unique.values())
-    rng.shuffle(pool)
-    fresh=[r for r in pool if tuple(r["fact_key"]) not in used_global]
-    seen=[r for r in fresh if r["seen_status"]=="seen"]
-    unseen=[r for r in fresh if r["seen_status"]=="unseen"]
-    chosen=seen[:min(10,len(seen))]+unseen[:min(10,len(unseen))]
-    seen=seen[min(10,len(seen)):]
-    unseen=unseen[min(10,len(unseen)):]
-    while len(chosen)<SUBSKILL and (seen or unseen):
-        nseen=sum(x["seen_status"]=="seen" for x in chosen)
-        nunseen=len(chosen)-nseen
-        choice=(seen if nseen<nunseen and seen else
-                unseen if nunseen<nseen and unseen else
-                unseen if unseen else seen)
-        chosen.append(choice.pop())
-    if len(chosen)<SUBSKILL:
-        # Scarce elementary factor ranges overlap other operation families,
-        # e.g. 8*7=56, 56/7=8, x*7=56. Allow a DIFFERENT PROMPT FORM once.
-        used_chosen={tuple(r["fact_key"]) for r in chosen}
-        reusable=[r for r in pool if tuple(r["fact_key"]) in used_global
-                  and tuple(r["fact_key"]) not in used_chosen]
-        rng.shuffle(reusable)
-        for r in reusable:
-            if len(chosen)>=SUBSKILL:break
-            chosen.append(r)
-    if len(chosen)<SUBSKILL:
-        raise RuntimeError(f"Only {len(chosen)}/{SUBSKILL} distinct eligible "
-                           "facts within this operation group and subskill.")
-    if len(chosen)!=SUBSKILL or len({tuple(r["fact_key"]) for r in chosen})!=SUBSKILL:
-        raise RuntimeError("Selection count or fact uniqueness violation")
-    return chosen
+    for sub in subs:
+        rows={tuple(x["fact_key"]):x for x in fake[("T",sub)]}
+        unique[sub]=rows
+    owner={}
+    assignment={}
+    def visit(slot,used):
+        for fact in unique[slot[0]]:
+            if fact in used:
+                continue
+            used.add(fact)
+            previous=owner.get(fact)
+            if previous is None or visit(previous,used):
+                owner[fact]=slot
+                assignment[slot]=fact
+                return True
+        return False
+    for slot in [(g,i) for g in subs for i in range(20)]:
+        assert visit(slot,set())
+    assert len(set(assignment.values()))==40
+    print("PASS joint matching: 29 vs 30 candidate strata sharing 19 facts, 40 unique assigned")
 
 def build():
     rng=random.Random(SEED)
@@ -251,22 +334,12 @@ def build():
     buckets,rejection=candidates(seen,protected)
     chosen=[]
     used=set()
-    used_in_group=defaultdict(set)
-    # Most constrained subsets first, then restore teacher-example group order.
-    ordering=sorted(
-        ((group,sub) for group in GROUPS for sub in STRATA[group]),
-        key=lambda item:(len(buckets[item]),item)
-    )
-    for group,sub in ordering:
-        try:
-            rows=select(buckets[(group,sub)],used,used_in_group[group],rng)
-        except RuntimeError as exc:
-            count=Counter(x["seen_status"] for x in buckets[(group,sub)])
-            raise RuntimeError(f"{group}/{sub}: candidates by old-train status "
-                               f"{dict(count)}; {exc}") from exc
+    # Constrained group matching, not greedy stratum-by-stratum selection.
+    # This preserves 20 facts per stratum and 80 unique facts per operation.
+    for group in GROUPS:
+        rows=select_group(group,buckets,used,rng)
         chosen.extend(rows)
         used.update(tuple(r["fact_key"]) for r in rows)
-        used_in_group[group].update(tuple(r["fact_key"]) for r in rows)
     order={group:i for i,group in enumerate(GROUPS)}
     suborder={(g,s):i for g in GROUPS for i,s in enumerate(STRATA[g])}
     chosen.sort(key=lambda r:(order[r["category"]],
@@ -385,6 +458,7 @@ def selftest():
     assert sum(1 for _ in GROUPS)==5
     assert all(len(v)==4 for v in STRATA.values())
     assert 5*4*20==400
+    test_matching()
     print("PASS 5 categories, 20 strata x20, carry/borrow labels, original teacher samples")
 
 def main():
