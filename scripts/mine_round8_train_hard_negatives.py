@@ -128,11 +128,12 @@ def load_train_only():
 
 
 def nearby_facts(seed,train_facts,excluded,rng,max_candidates=64):
-    """Change arithmetic operands by <=3; preserve the original question form and bounded difficulty.
+    """Change arithmetic operands by <=3; same question class and bounded difficulty.
 
-    Changing a digit is NOT inserting the original wrong validation question.
-    Every new math fact must hash to the original train partition and be absent
-    from previous train facts and ALL held-out/public protected math facts.
+    These are new *exercises*, not necessarily unseen mathematical facts:
+    revisiting a familiar train fact with varied numbers is allowed.
+    The adjusted fact must remain train-partition and avoid ALL held-out/public
+    protected math facts. We never copy an evaluation question.
     """
     from generate_round1 import stable_split,parse_relation
     from generate_round3_structured import sum_relations,product_relations
@@ -157,7 +158,7 @@ def nearby_facts(seed,train_facts,excluded,rng,max_candidates=64):
             for row in rows:
                 if row["category"]!=category:continue
                 fact=parse_relation(row["prompt"],str(row["answer"]))
-                if (fact in excluded or fact in train_facts or
+                if (fact in excluded or fact==old or
                     stable_split(fact,SEED)!="train"):
                     continue
                 candidates.append({
@@ -260,9 +261,10 @@ def mine(args):
             print(f"MINED {i+1}/{len(source)}, strict numeric wrong and well-formed="
                   f"{len(original_wrong)}",flush=True)
 
-    # Numerical transformations are driven only by patterns of TRAIN questions
-    # that the model actually answered wrongly. No validation/public prompt is
-    # used as a seed. New relations are constrained to products <=999.
+    # Numerical transformations are driven only by TRAIN questions
+    # that the model actually answered wrongly. No validation/public prompt
+    # is used as a seed. Variants MAY revisit an old train mathematical fact
+    # but NEVER a held-out one, and no product is >=1000.
     variants=[]
     seen_variant_facts=set()
     for seed in original_wrong:
