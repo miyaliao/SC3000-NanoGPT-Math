@@ -174,9 +174,7 @@ def make():
     summary = {}
     for arm, src in full.items():
         rows = [src[i] for i in order]
-        new_rows = rows if arm == "replay" else [
-            src[i] for i in order if i >= REPLAY_N
-        ]
+        new_rows = [src[i] for i in order if i >= REPLAY_N]
         for r in rows:
             check_one(r, vocab, protected, new=False)
         for r in new_rows:
@@ -187,7 +185,12 @@ def make():
         summary[arm] = {
             "total_rows": len(rows), "extra_rows": len(new_rows),
             "extra_unique_facts": len(keys), "extra_new_to_historical_facts": len(keys - seen),
-            "extra_unique_prompts": len({POS.fullmatch(r["positive"])["prompt"] for r in new_rows})
+            "extra_unique_prompts": len({POS.fullmatch(r["positive"])["prompt"] for r in new_rows}),
+            "extra_by_category": (dict(Counter(r["category"] for r in new_rows))
+                                  if arm != "replay" else {}),
+            "extra_by_category_bin": (
+                {k:dict(Counter(r["bin"] for r in new_rows if r["category"]==k))
+                 for k in KINDS} if arm != "replay" else {})
         }
         if arm == "structured":
             for idx, r in zip(order, rows):
@@ -204,9 +207,6 @@ def make():
     if pairs["structured"] == pairs["random"]:
         raise RuntimeError("Random and Structured samples unexpectedly identical")
     if len(structured_meta) != ROWS: raise RuntimeError("Misaligned metadata")
-    # Make sure the negative-matched H arm can reproduce S byte-for-byte.
-    assert all(a["positive"] == b["positive"] for a,b in
-               zip(pairs["structured"], [pairs["structured"][i] for i in range(ROWS)]))
     manifest = {
         "version":"round9_structured_v1", "seed":SEED,
         "base_checkpoint_sha256":digest(BASE),
