@@ -130,7 +130,7 @@ def mine(mode,device,max_new_tokens,pilot_per_category):
         eligible=(stop=="period" and wrong is not None and status=="math_error")
         if eligible:
             negative=r["prompt"]+(completion if completion.startswith(" ") else " "+completion)
-            if max(len(negative),len(r["prompt"]+" The answer is "+r["answer"]+".")+4>256:
+            if max(len(negative), len(r["prompt"]+" The answer is "+r["answer"]+".")) + 4 > 256:
                 eligible=False
                 counts["too_long"]+=1
             elif set(negative)-set(stoi):
