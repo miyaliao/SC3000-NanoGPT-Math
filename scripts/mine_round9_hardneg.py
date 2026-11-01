@@ -216,6 +216,152 @@ def mine(mode,device,max_new_tokens,pilot_per_category,resume=False,max_question
     print(f"MINE PASS mode={mode}, usable={len(errors)}/{len(selected)} => {dest}")
 
 
+
+def finalize_partial(preview_only=False):
+    """CPU-only: validate a durable partial FULL progress snapshot before early finalization."""
+    rows, metadata, manifest, protected = inputs()
+    folder = OUT / "full"
+    progress_path = folder / "progress.json"
+    if not progress_path.is_file():
+        raise FileNotFoundError("No resumable full/progress.json; nothing to finalize")
+    if (folder / "manifest.json").exists() or (folder / "errors.json").exists():
+        raise RuntimeError("Existing finalized outputs; refusing to overwrite")
+
+    state = read(progress_path)
+    if state.get("version") != "round9_mining_progress_v1":
+        raise RuntimeError("Unknown progress format")
+    checks = {
+        "mode":"full",
+        "source_structured_sha256":manifest["files_sha256"]["structured"],
+        "source_metadata_sha256":manifest["files_sha256"]["structured_metadata"],
+        "base_checkpoint_sha256":sha(BASE),
+        "max_new_tokens":80,
+    }
+    for name, expected in checks.items():
+        if state.get(name) != expected:
+            raise RuntimeError(f"Frozen mining progress mismatch: {name}")
+
+    # Regenerate original deterministic selection on CPU. This guarantees that
+    # the 24k processed questions correspond to the previously fixed TRAIN-only
+    # ordering, and not to hand-selected validation examples.
+    unique = {}
+    for item in metadata:
+        key = tuple(item["fact_key"])
+        if key in protected:
+            continue
+        prompt = item["prompt"]
+        if prompt not in unique:
+            unique[prompt] = {
+                "prompt":prompt, "answer":item["answer"],
+                "category":kind(prompt), "source":item["source"],
+                "fact_key":item["fact_key"]
+            }
+        elif unique[prompt]["answer"] != item["answer"]:
+            raise RuntimeError("Conflicting answers for one prompt")
+
+    groups = defaultdict(list)
+    for item in unique.values():
+        groups[item["category"]].append(item)
+    randomizer = random.Random(4200919)
+    selected = []
+    for category in KINDS:
+        ordered = sorted(groups[category], key=lambda x:x["prompt"])
+        new = [x for x in ordered if x["source"] == "new"]
+        old = [x for x in ordered if x["source"] != "new"]
+        randomizer.shuffle(new)
+        randomizer.shuffle(old)
+        selected.extend(new + old)
+    randomizer.shuffle(selected)
+    expected_selection_sha = hashlib.sha256(
+        blob([r["prompt"] for r in selected])
+    ).hexdigest()
+    processed = state.get("processed")
+    if (state.get("selected_prompt_sha256") != expected_selection_sha or
+        state.get("total_selected") != len(selected) or
+        not isinstance(processed, int) or
+        not 0 < processed <= len(selected)):
+        raise RuntimeError("Selection hash or processed offset mismatch")
+
+    all_errors = state["errors"]
+    if len(all_errors) != state["counts"].get("numeric_wrong", 0):
+        raise RuntimeError("Saved numerical error count mismatch")
+    examined = {r["prompt"]:r for r in selected[:processed]}
+    accepted = {}
+    for error in all_errors:
+        prompt = error["prompt"]
+        if prompt not in examined or prompt in accepted:
+            raise RuntimeError("Mined error was not a distinct examined TRAIN question")
+        expected = examined[prompt]
+        fact = tuple(error["fact_key"])
+        if (error["answer"] != expected["answer"] or
+            fact != tuple(expected["fact_key"]) or
+            fact in protected or stable_split(fact,42) != "train" or
+            parse_relation(prompt,error["answer"]) != fact):
+            raise RuntimeError("Mined answer/fact protection mismatch")
+        if (error.get("stop_reason") != "period" or
+            parse_model_error(error["completion"],error["answer"]) is None):
+            raise RuntimeError("Saved response was not a complete math-wrong model answer")
+        negative = prompt + (
+            error["completion"] if error["completion"].startswith(" ")
+            else " " + error["completion"])
+        if error["negative"] != negative or len(negative)+4 > 256:
+            raise RuntimeError("Mined negative text/context mismatch")
+        accepted[prompt] = error
+
+    candidate_rows = defaultdict(list)
+    for idx, item in enumerate(metadata):
+        if item["prompt"] in accepted and tuple(item["fact_key"]) not in protected:
+            candidate_rows[kind(item["prompt"])].append(idx)
+    max_rows = 0
+    possible_by_category = {}
+    for category in KINDS:
+        frequencies = Counter(metadata[i]["prompt"] for i in candidate_rows[category])
+        count = min(500, sum(min(n, MAX_PER_UNIQUE_PROMPT) for n in frequencies.values()))
+        possible_by_category[category] = count
+        max_rows += count
+    replacement_capacity = min(MAX_REPLACEMENTS,max_rows)
+    print(f"PARTIAL CHECK PASS processed={processed}/{len(selected)} "
+          f"unique_valid_wrong={len(all_errors)}",flush=True)
+    print(f"H training replacement capacity={replacement_capacity}/{MAX_REPLACEMENTS} "
+          f"by_category={possible_by_category}",flush=True)
+    if preview_only:
+        print("PREVIEW ONLY; no files written")
+        return
+    if len(all_errors) < 20 or replacement_capacity < 1:
+        raise RuntimeError("Insufficient usable errors to finalize partial mining")
+    counts = state["counts"]
+    if sum(counts.get(status,0) for status in
+           ("numeric_wrong","numeric_correct","math_error","format_failure","refusal")) != processed:
+        raise RuntimeError("Progress response categories do not sum to processed questions")
+    audit = {
+        "version":"round9_mined_v1","mode":"full",
+        "partial_finalized":processed < len(selected),
+        "full_selection_size":len(selected),
+        "source_structured_sha256":checks["source_structured_sha256"],
+        "source_metadata_sha256":checks["source_metadata_sha256"],
+        "base_checkpoint_sha256":checks["base_checkpoint_sha256"],
+        "selected_prompt_sha256":expected_selection_sha,
+        "max_new_tokens":checks["max_new_tokens"],
+        "decode":"greedy original-stop",
+        "eligible_unique_training_prompts":len(unique),
+        "evaluated_unique_prompts":processed,
+        "usable_wrong_unique":len(all_errors),
+        "counts":counts,
+        "by_category":state["by_category"],
+        "previews":state["previews"],
+        "hardneg_replacement_capacity":replacement_capacity,
+        "replacement_capacity_by_category":possible_by_category,
+        "errors_sha256":hashlib.sha256(blob(all_errors)).hexdigest()
+    }
+    with (folder/"errors.json").open("xb") as file:
+        file.write(blob(all_errors))
+    with (folder/"manifest.json").open("xb") as file:
+        file.write(blob(audit))
+    print(f"PARTIAL FINALIZED {processed}/{len(selected)} "
+          f"usable_wrong={len(all_errors)}; ready for --assemble",flush=True)
+
+
+
 def assemble():
     rows,meta,m,protected=inputs()
     minedir=OUT/"full"
@@ -309,6 +455,8 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--mine",choices=("pilot","full"))
     p.add_argument("--assemble",action="store_true")
+    p.add_argument("--preview-partial",action="store_true",help="CPU-only review of saved full-mining progress and H replacement capacity")
+    p.add_argument("--finalize-partial",action="store_true",help="CPU-only finalize vetted saved full-mining progress without more GPU inference")
     p.add_argument("--device",choices=("cpu","cuda"),default="cuda")
     p.add_argument("--max-new-tokens",type=int,default=80)
     p.add_argument("--pilot-per-category",type=int,default=50)
@@ -317,11 +465,13 @@ def main():
     p.add_argument("--max-questions-per-job",type=int,default=0,
                    help="Optional chunk cap; 0 means finish all selected questions")
     args=p.parse_args()
-    if bool(args.mine)==bool(args.assemble):
-        p.error("Choose exactly one of --mine pilot|full or --assemble")
+    if sum((bool(args.mine),args.assemble,args.preview_partial,args.finalize_partial)) != 1:
+        p.error("Choose one of --mine pilot|full, --assemble, --preview-partial, --finalize-partial")
     if args.pilot_per_category<1 or args.max_new_tokens<1 or args.max_questions_per_job<0:
         p.error("Positive limits required")
-    if args.assemble:assemble()
+    if args.preview_partial:finalize_partial(preview_only=True)
+    elif args.finalize_partial:finalize_partial(preview_only=False)
+    elif args.assemble:assemble()
     else:mine(args.mine,args.device,args.max_new_tokens,args.pilot_per_category,
               resume=args.resume,max_questions_per_job=args.max_questions_per_job)
 
