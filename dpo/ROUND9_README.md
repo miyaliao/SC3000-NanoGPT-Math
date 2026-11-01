@@ -86,3 +86,30 @@ scripts/mine_round9_hardneg.py — unique train prompt pilot/full mining + H con
 scripts/train_round9.py — matched training + all fixed evaluations.
 scripts/compare_round9.py — read-only paired comparison.
 scripts/round9_mine.sbatch and scripts/round9_train.sbatch — TC1 runners.
+
+## Random E2 restarted continuation (Round9 follow-up)
+
+**Chosen checkpoint:** Round9 Random E1 (`dpo/experiments/round9_random/dpo.pt`) because historical strict Val768=578 and Extended384=176 are highest in Round9. Round7 Replay keeps a higher Teacher680=498 vs Random=489, so no broad-best claim. Existing R/U/S/H accuracy after one Epoch: R Val575 OOD110 Extended171 Teacher494; U 578/110/176/489; S 572/110/170/493; H 536/100/158/464. H is not selected.
+
+**What exactly changes:** Start from the frozen Random E1 model weights and run the same 100k Random preference rows for one additional epoch. Keep same Course Loss, batch64, LR1e-5, seed42, 1562 updates, greedy stop and fixed Val768/OOD256/Extended384/Teacher680. Since Random E1 checkpoint did **not** save AdamW/scheduler state, this is an **optimizer/scheduler restarted continuation**, **not** a mathematically exact uninterrupted Epoch2; report the distinction. The script checks E1 manifest SHA, dataset SHA, original initialization SHA and parent checkpoint presence, and never overwrites `round9_random/`.
+
+**TC1 (no other GPU job active; safely preserve local edits):**
+
+    cd ~/NanoGPT-Math
+    git status --short
+    git pull --ff-only origin round9-balanced-self-hardneg
+    source .venv/bin/activate
+
+    python scripts/train_round9_random_e2.py --check-only
+
+    # Small isolated GPU smoke is recommended before the full job:
+    # inside a one-GPU Slurm allocation run:
+    python scripts/train_round9_random_e2.py --smoke --device cuda
+
+    sbatch scripts/round9_random_e2.sbatch
+
+    # After the full job finishes and reports ROUND9 CONTINUATION PASS:
+    python scripts/compare_round9_random_e2.py --check-only
+    python scripts/compare_round9_random_e2.py
+
+Outputs under `dpo/experiments/round9_random_e2_restart/` include `dpo.pt`, `summary.json`, all frozen predictions, and `paired_vs_random_e1.json` (comparison script). Stop further training if new Val768 gain is small or fact-disjoint OOD/Extended regresses materially. Do not use the sealed Round3 final Test for choosing this checkpoint.
