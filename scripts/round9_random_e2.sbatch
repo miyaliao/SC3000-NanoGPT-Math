@@ -1,0 +1,17 @@
+#!/bin/bash
+#SBATCH --partition=UGGPU-TC1
+#SBATCH --qos=normal
+#SBATCH --nodes=1
+#SBATCH --gres=gpu:1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=24G
+#SBATCH --time=04:00:00
+#SBATCH --job-name=round9_R_e2
+#SBATCH --output=round9_random_e2_%j.out
+#SBATCH --error=round9_random_e2_%j.err
+set -euo pipefail
+cd "$SLURM_SUBMIT_DIR"
+source .venv/bin/activate
+export PYTHONNOUSERSITE=1
+python scripts/train_round9_random_e2.py --arm random --device cuda \
+  --epochs 1 --batch-size 64 --lr 1e-5 --max-new-tokens 80
