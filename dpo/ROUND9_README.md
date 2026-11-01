@@ -40,14 +40,19 @@ Activate existing venv, then switch to this experimental branch. Do not discard 
 
 Inspect dpo/data/round9_balanced_full/manifest.json and sample examples before GPU.
 
-First mine a limited unique-question pilot: up to 50 questions per category (600 max), not 100k repeated rows:
+First mine a limited unique-question pilot: up to 50 questions per category (600 max), not 100k repeated rows. Observed on TC1 2026-11-01: 434/600 correct, 166/600 (27.67%) valid strictly formatted numerical errors. Error rates include add 4/50, subtract 11/50, multiply 30/50, x_over_a 23/50, x_minus_a 3/50. These are pilot sample rates, not guaranteed full-corpus rates:
 
     squeue -u "$USER"
     sbatch scripts/round9_mine.sbatch pilot
 
 Inspect dpo/experiments/round9_mining/pilot/manifest.json and errors.json. Check how many REAL math-error completions are valid and how many are merely format failures. Full mode runs all eligible unique training prompts once and may be expensive; its runtime must fit TC1 QoS. Only proceed if pilot yield and examples justify it:
 
+    # Full mining is split into restartable batches of up to 8,000 unique prompts.
+    # Each job requests TC1's user-confirmed 6-hour maximum and checkpoints every 200.
     sbatch scripts/round9_mine.sbatch full
+    # Once the previous job exits, if output ends in PARTIAL, submit again:
+    sbatch scripts/round9_mine.sbatch full --resume
+    # Repeat --resume (with at most one mining job active) until MINE PASS.
     python scripts/mine_round9_hardneg.py --assemble
     python scripts/train_round9.py --arm hardneg --device cpu --check-only
 
