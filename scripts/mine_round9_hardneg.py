@@ -244,17 +244,31 @@ def assemble():
     rng=random.Random(4200927)
     chosen=[]
     uses=Counter()
-    # Fairness: do not allow one operation to monopolize all 5000 substitutions.
+    per_category=Counter()
+    # Round-robin allocation prevents early task types from consuming all 5000
+    # presentations before e.g. x_over_a / a_over_x are even considered.
     max_per_category=500
+    queues={}
     for category in KINDS:
         ids=candidates[category][:]
         rng.shuffle(ids)
-        taken=0
-        for i in ids:
-            if len(chosen)>=MAX_REPLACEMENTS or taken>=max_per_category:break
-            prompt=meta[i]["prompt"]
-            if uses[prompt]>=MAX_PER_UNIQUE_PROMPT:continue
-            chosen.append(i);uses[prompt]+=1;taken+=1
+        queues[category]=ids
+    while len(chosen)<MAX_REPLACEMENTS:
+        made_progress=False
+        for category in KINDS:
+            if len(chosen)>=MAX_REPLACEMENTS:break
+            if per_category[category]>=max_per_category:continue
+            ids=queues[category]
+            while ids:
+                i=ids.pop()
+                prompt=meta[i]["prompt"]
+                if uses[prompt]>=MAX_PER_UNIQUE_PROMPT:continue
+                chosen.append(i)
+                uses[prompt]+=1
+                per_category[category]+=1
+                made_progress=True
+                break
+        if not made_progress:break
     if not chosen:raise RuntimeError("No eligible hard negatives to apply")
     hard=[dict(r) for r in rows]
     for i in chosen:
