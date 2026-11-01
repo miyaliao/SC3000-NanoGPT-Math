@@ -1,0 +1,129 @@
+{
+  "version": "teacher_style_extension_280_v1",
+  "seed": 20261031,
+  "design": "7 remaining original SC3000 math categories, each 4x10; inspired by ICLR 2024 digit/operation difficulty",
+  "paper_repo": "https://github.com/lee-ny/teaching_arithmetic",
+  "not_an_official_ICLR_dataset": true,
+  "not_a_TA_hidden_test": true,
+  "core_reference": {
+    "core_questions_sha256": "c27518670be350154e9eb8d93ec7126a518c4d3cd4cf23a942649970011e4396",
+    "core_manifest_sha256": "33bd6a7f0abd27aaa233adccb1758b1e8767b5f8e2ed295315d4867681879c1a",
+    "core_n_prompts": 400,
+    "core_n_canonical_facts": 354
+  },
+  "source_sha256": {
+    "round3_train_meta": "165ff58d0e7011c7b15c57225dee2abef8789552a624e767ca2b23a6f296d1c7",
+    "round3_val": "037ef377a5dae8189669b88217ca95fa09c05601bac811fbbe7c52715f6f2351",
+    "round4_treatment": "ffce5bf696ddef987734b7edea58727fd0bf55f9b431814cc9dcfa81c519894e",
+    "round4_extended_val": "0718452058fe6f248b53874724cfced885a4f0572452cd6b1cb34b82e1dda944",
+    "round5_train": "ffce5bf696ddef987734b7edea58727fd0bf55f9b431814cc9dcfa81c519894e",
+    "old_ood": "f83393173cbbf73008d443a059651ca82fb360375f343bcb80a7dc8a6cb49b25",
+    "published_public_blind": "c5b8400788a3749a23779a0f7d818b6e5645ed0f1a20a96665d64614817e1e5e"
+  },
+  "groups": [
+    "subtract",
+    "x_plus_a",
+    "a_plus_x",
+    "x_minus_a",
+    "a_times_x",
+    "x_over_a",
+    "a_over_x"
+  ],
+  "subskills": {
+    "subtract": [
+      "result_1digit_borrow0",
+      "result_1digit_borrow1",
+      "result_2digit_borrow0",
+      "result_2digit_borrow1"
+    ],
+    "x_plus_a": [
+      "answer_1digit_carry0",
+      "answer_1digit_carry1",
+      "answer_2digit_carry0",
+      "answer_2digit_carry1"
+    ],
+    "a_plus_x": [
+      "answer_1digit_carry0",
+      "answer_1digit_carry1",
+      "answer_2digit_carry0",
+      "answer_2digit_carry1"
+    ],
+    "x_minus_a": [
+      "subtrahend_1digit_borrow0",
+      "subtrahend_1digit_borrow1",
+      "subtrahend_2digit_borrow0",
+      "subtrahend_2digit_borrow1"
+    ],
+    "a_times_x": [
+      "unknown_1digit_known_2digit",
+      "unknown_2digit_known_1digit",
+      "both_2digit_product_100_400",
+      "both_2digit_product_401_999"
+    ],
+    "x_over_a": [
+      "divisor_1digit_quotient_2digit",
+      "divisor_2digit_quotient_1digit",
+      "both_2digit_product_100_400",
+      "both_2digit_product_401_999"
+    ],
+    "a_over_x": [
+      "answer_1digit_quotient_2digit",
+      "answer_2digit_quotient_1digit",
+      "both_2digit_product_100_400",
+      "both_2digit_product_401_999"
+    ]
+  },
+  "quota_per_group": 40,
+  "quota_per_subskill": 10,
+  "selected_n": 280,
+  "all_unique_prompts": true,
+  "unique_math_facts_total": 243,
+  "within_subskill_unique_math_facts": true,
+  "within_group_unique_math_facts": {
+    "subtract": 40,
+    "x_plus_a": 40,
+    "a_plus_x": 40,
+    "x_minus_a": 40,
+    "a_times_x": 40,
+    "x_over_a": 40,
+    "a_over_x": 40
+  },
+  "by_seen_status": {
+    "subtract": {
+      "seen": 40
+    },
+    "x_plus_a": {
+      "seen": 40
+    },
+    "a_plus_x": {
+      "seen": 40
+    },
+    "x_minus_a": {
+      "seen": 40
+    },
+    "a_times_x": {
+      "seen": 40
+    },
+    "x_over_a": {
+      "seen": 40
+    },
+    "a_over_x": {
+      "seen": 40
+    }
+  },
+  "total_seen": 280,
+  "total_unseen": 0,
+  "historical_seen_is_not_generalization": true,
+  "canonical_fact_disjoint_with_core400": true,
+  "canonical_fact_disjoint_with_old_val_ood_extended_public_and_teacher": true,
+  "original_stable_partition_train_only": true,
+  "future_round8_training_on_these_facts_forbidden": true,
+  "no_sealed_test_file_opened": true,
+  "selection": "maximum matching per group with disclosed cross-stratum reuse if needed",
+  "rejected_candidate_counts": {
+    "original_split_not_train": 4360,
+    "protected": 5180
+  },
+  "evaluation": "greedy model.py period/newline stopping, fixed strict answer-first parser",
+  "questions_sha256": "5466a01690e536412bfb2eb84544d72cd672d20ab450d7c9b723a8581256af4d"
+}

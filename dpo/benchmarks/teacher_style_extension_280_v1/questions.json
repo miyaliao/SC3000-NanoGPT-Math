@@ -1,0 +1,3642 @@
+[
+  {
+    "prompt": "17-16=?",
+    "answer": "1",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "1",
+      "16",
+      "17"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "18-13=?",
+    "answer": "5",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "5",
+      "13",
+      "18"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "28-25=?",
+    "answer": "3",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "3",
+      "25",
+      "28"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "39-38=?",
+    "answer": "1",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "1",
+      "38",
+      "39"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "57-54=?",
+    "answer": "3",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "3",
+      "54",
+      "57"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "58-53=?",
+    "answer": "5",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "5",
+      "53",
+      "58"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "58-56=?",
+    "answer": "2",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "2",
+      "56",
+      "58"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "79-75=?",
+    "answer": "4",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "4",
+      "75",
+      "79"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "88-85=?",
+    "answer": "3",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "3",
+      "85",
+      "88"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "89-80=?",
+    "answer": "9",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "9",
+      "80",
+      "89"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "10-1=?",
+    "answer": "9",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "1",
+      "9",
+      "10"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "10-2=?",
+    "answer": "8",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "2",
+      "8",
+      "10"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "10-3=?",
+    "answer": "7",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "3",
+      "7",
+      "10"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "10-4=?",
+    "answer": "6",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "4",
+      "6",
+      "10"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "11-2=?",
+    "answer": "9",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "2",
+      "9",
+      "11"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "12-5=?",
+    "answer": "7",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "5",
+      "7",
+      "12"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "12-6=?",
+    "answer": "6",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "6",
+      "6",
+      "12"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "13-5=?",
+    "answer": "8",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "5",
+      "8",
+      "13"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "13-6=?",
+    "answer": "7",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "6",
+      "7",
+      "13"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "17-8=?",
+    "answer": "9",
+    "category": "subtract",
+    "subskill": "result_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "8",
+      "9",
+      "17"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "46-16=?",
+    "answer": "30",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "16",
+      "30",
+      "46"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "56-12=?",
+    "answer": "44",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "12",
+      "44",
+      "56"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "58-11=?",
+    "answer": "47",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "11",
+      "47",
+      "58"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "74-10=?",
+    "answer": "64",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "10",
+      "64",
+      "74"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "74-21=?",
+    "answer": "53",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "21",
+      "53",
+      "74"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "85-15=?",
+    "answer": "70",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "15",
+      "70",
+      "85"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "96-42=?",
+    "answer": "54",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "42",
+      "54",
+      "96"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "97-21=?",
+    "answer": "76",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "21",
+      "76",
+      "97"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "98-27=?",
+    "answer": "71",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "27",
+      "71",
+      "98"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "99-47=?",
+    "answer": "52",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "47",
+      "52",
+      "99"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "42-18=?",
+    "answer": "24",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "18",
+      "24",
+      "42"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "50-21=?",
+    "answer": "29",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "21",
+      "29",
+      "50"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "52-26=?",
+    "answer": "26",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "26",
+      "26",
+      "52"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "60-11=?",
+    "answer": "49",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "11",
+      "49",
+      "60"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "60-14=?",
+    "answer": "46",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "14",
+      "46",
+      "60"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "80-19=?",
+    "answer": "61",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "19",
+      "61",
+      "80"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "87-38=?",
+    "answer": "49",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "38",
+      "49",
+      "87"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "90-37=?",
+    "answer": "53",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "37",
+      "53",
+      "90"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "92-19=?",
+    "answer": "73",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "19",
+      "73",
+      "92"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "92-28=?",
+    "answer": "64",
+    "category": "subtract",
+    "subskill": "result_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "28",
+      "64",
+      "92"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+1=3,x=?",
+    "answer": "2",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "1",
+      "2",
+      "3"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+1=4,x=?",
+    "answer": "3",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "1",
+      "3",
+      "4"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+1=5,x=?",
+    "answer": "4",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "1",
+      "4",
+      "5"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+1=8,x=?",
+    "answer": "7",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "1",
+      "7",
+      "8"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+2=5,x=?",
+    "answer": "3",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "2",
+      "3",
+      "5"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+2=6,x=?",
+    "answer": "4",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "2",
+      "4",
+      "6"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+2=9,x=?",
+    "answer": "7",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "2",
+      "7",
+      "9"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+3=9,x=?",
+    "answer": "6",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "3",
+      "6",
+      "9"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+4=8,x=?",
+    "answer": "4",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "4",
+      "4",
+      "8"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+4=9,x=?",
+    "answer": "5",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "4",
+      "5",
+      "9"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+3=11,x=?",
+    "answer": "8",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "3",
+      "8",
+      "11"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+4=11,x=?",
+    "answer": "7",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "4",
+      "7",
+      "11"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+4=12,x=?",
+    "answer": "8",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "4",
+      "8",
+      "12"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+5=11,x=?",
+    "answer": "6",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "5",
+      "6",
+      "11"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+5=14,x=?",
+    "answer": "9",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "5",
+      "9",
+      "14"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+6=12,x=?",
+    "answer": "6",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "6",
+      "6",
+      "12"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+6=14,x=?",
+    "answer": "8",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "6",
+      "8",
+      "14"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+7=14,x=?",
+    "answer": "7",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "7",
+      "7",
+      "14"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+7=15,x=?",
+    "answer": "8",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "7",
+      "8",
+      "15"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+8=16,x=?",
+    "answer": "8",
+    "category": "x_plus_a",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "8",
+      "8",
+      "16"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+22=62,x=?",
+    "answer": "40",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "22",
+      "40",
+      "62"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+30=89,x=?",
+    "answer": "59",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "30",
+      "59",
+      "89"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+33=127,x=?",
+    "answer": "94",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "33",
+      "94",
+      "127"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+37=119,x=?",
+    "answer": "82",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "37",
+      "82",
+      "119"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+41=122,x=?",
+    "answer": "81",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "41",
+      "81",
+      "122"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+42=95,x=?",
+    "answer": "53",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "42",
+      "53",
+      "95"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+43=116,x=?",
+    "answer": "73",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "43",
+      "73",
+      "116"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+45=97,x=?",
+    "answer": "52",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "45",
+      "52",
+      "97"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+52=127,x=?",
+    "answer": "75",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "52",
+      "75",
+      "127"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+54=108,x=?",
+    "answer": "54",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "54",
+      "54",
+      "108"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+16=100,x=?",
+    "answer": "84",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "16",
+      "84",
+      "100"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+16=71,x=?",
+    "answer": "55",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "16",
+      "55",
+      "71"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+17=94,x=?",
+    "answer": "77",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "17",
+      "77",
+      "94"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+18=67,x=?",
+    "answer": "49",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "18",
+      "49",
+      "67"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+24=51,x=?",
+    "answer": "27",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "24",
+      "27",
+      "51"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+35=104,x=?",
+    "answer": "69",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "35",
+      "69",
+      "104"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+47=130,x=?",
+    "answer": "83",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "47",
+      "83",
+      "130"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+49=146,x=?",
+    "answer": "97",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "49",
+      "97",
+      "146"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+56=151,x=?",
+    "answer": "95",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "56",
+      "95",
+      "151"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x+69=154,x=?",
+    "answer": "85",
+    "category": "x_plus_a",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "69",
+      "85",
+      "154"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "1+x=2,x=?",
+    "answer": "1",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "1",
+      "1",
+      "2"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "1+x=7,x=?",
+    "answer": "6",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "1",
+      "6",
+      "7"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "2+x=4,x=?",
+    "answer": "2",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "2",
+      "2",
+      "4"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "2+x=5,x=?",
+    "answer": "3",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "2",
+      "3",
+      "5"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "2+x=6,x=?",
+    "answer": "4",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "2",
+      "4",
+      "6"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "2+x=8,x=?",
+    "answer": "6",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "2",
+      "6",
+      "8"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "3+x=6,x=?",
+    "answer": "3",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "3",
+      "3",
+      "6"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "3+x=9,x=?",
+    "answer": "6",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "3",
+      "6",
+      "9"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "4+x=8,x=?",
+    "answer": "4",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "4",
+      "4",
+      "8"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "4+x=9,x=?",
+    "answer": "5",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry0",
+    "fact_key": [
+      "add",
+      "4",
+      "5",
+      "9"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "2+x=10,x=?",
+    "answer": "8",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "2",
+      "8",
+      "10"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "2+x=11,x=?",
+    "answer": "9",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "2",
+      "9",
+      "11"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "3+x=11,x=?",
+    "answer": "8",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "3",
+      "8",
+      "11"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "4+x=10,x=?",
+    "answer": "6",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "4",
+      "6",
+      "10"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "4+x=12,x=?",
+    "answer": "8",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "4",
+      "8",
+      "12"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "5+x=11,x=?",
+    "answer": "6",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "5",
+      "6",
+      "11"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "6+x=12,x=?",
+    "answer": "6",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "6",
+      "6",
+      "12"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "7+x=14,x=?",
+    "answer": "7",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "7",
+      "7",
+      "14"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "7+x=15,x=?",
+    "answer": "8",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "7",
+      "8",
+      "15"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "8+x=17,x=?",
+    "answer": "9",
+    "category": "a_plus_x",
+    "subskill": "answer_1digit_carry1",
+    "fact_key": [
+      "add",
+      "8",
+      "9",
+      "17"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "10+x=93,x=?",
+    "answer": "83",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "10",
+      "83",
+      "93"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "14+x=98,x=?",
+    "answer": "84",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "14",
+      "84",
+      "98"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "24+x=74,x=?",
+    "answer": "50",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "24",
+      "50",
+      "74"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "30+x=124,x=?",
+    "answer": "94",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "30",
+      "94",
+      "124"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "32+x=97,x=?",
+    "answer": "65",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "32",
+      "65",
+      "97"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "40+x=87,x=?",
+    "answer": "47",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "40",
+      "47",
+      "87"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "61+x=125,x=?",
+    "answer": "64",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "61",
+      "64",
+      "125"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "62+x=144,x=?",
+    "answer": "82",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "62",
+      "82",
+      "144"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "63+x=156,x=?",
+    "answer": "93",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "63",
+      "93",
+      "156"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "67+x=139,x=?",
+    "answer": "72",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry0",
+    "fact_key": [
+      "add",
+      "67",
+      "72",
+      "139"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "13+x=60,x=?",
+    "answer": "47",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "13",
+      "47",
+      "60"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "15+x=81,x=?",
+    "answer": "66",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "15",
+      "66",
+      "81"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "25+x=120,x=?",
+    "answer": "95",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "25",
+      "95",
+      "120"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "39+x=83,x=?",
+    "answer": "44",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "39",
+      "44",
+      "83"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "41+x=130,x=?",
+    "answer": "89",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "41",
+      "89",
+      "130"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "52+x=121,x=?",
+    "answer": "69",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "52",
+      "69",
+      "121"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "56+x=155,x=?",
+    "answer": "99",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "56",
+      "99",
+      "155"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "57+x=136,x=?",
+    "answer": "79",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "57",
+      "79",
+      "136"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "58+x=147,x=?",
+    "answer": "89",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "58",
+      "89",
+      "147"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "73+x=151,x=?",
+    "answer": "78",
+    "category": "a_plus_x",
+    "subskill": "answer_2digit_carry1",
+    "fact_key": [
+      "add",
+      "73",
+      "78",
+      "151"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-1=31,x=?",
+    "answer": "32",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "1",
+      "31",
+      "32"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-1=48,x=?",
+    "answer": "49",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "1",
+      "48",
+      "49"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-1=90,x=?",
+    "answer": "91",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "1",
+      "90",
+      "91"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-1=93,x=?",
+    "answer": "94",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "1",
+      "93",
+      "94"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-2=60,x=?",
+    "answer": "62",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "2",
+      "60",
+      "62"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-2=90,x=?",
+    "answer": "92",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "2",
+      "90",
+      "92"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-3=14,x=?",
+    "answer": "17",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "3",
+      "14",
+      "17"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-5=14,x=?",
+    "answer": "19",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "5",
+      "14",
+      "19"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-5=91,x=?",
+    "answer": "96",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "5",
+      "91",
+      "96"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-9=60,x=?",
+    "answer": "69",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow0",
+    "fact_key": [
+      "add",
+      "9",
+      "60",
+      "69"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-2=9,x=?",
+    "answer": "11",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "2",
+      "9",
+      "11"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-3=8,x=?",
+    "answer": "11",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "3",
+      "8",
+      "11"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-4=7,x=?",
+    "answer": "11",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "4",
+      "7",
+      "11"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-4=8,x=?",
+    "answer": "12",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "4",
+      "8",
+      "12"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-5=7,x=?",
+    "answer": "12",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "5",
+      "7",
+      "12"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-5=8,x=?",
+    "answer": "13",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "5",
+      "8",
+      "13"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-5=9,x=?",
+    "answer": "14",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "5",
+      "9",
+      "14"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-6=7,x=?",
+    "answer": "13",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "6",
+      "7",
+      "13"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-8=8,x=?",
+    "answer": "16",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "8",
+      "8",
+      "16"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-8=9,x=?",
+    "answer": "17",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_1digit_borrow1",
+    "fact_key": [
+      "add",
+      "8",
+      "9",
+      "17"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-12=15,x=?",
+    "answer": "27",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "12",
+      "15",
+      "27"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-12=64,x=?",
+    "answer": "76",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "12",
+      "64",
+      "76"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-13=85,x=?",
+    "answer": "98",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "13",
+      "85",
+      "98"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-16=40,x=?",
+    "answer": "56",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "16",
+      "40",
+      "56"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-21=72,x=?",
+    "answer": "93",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "21",
+      "72",
+      "93"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-22=64,x=?",
+    "answer": "86",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "22",
+      "64",
+      "86"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-23=42,x=?",
+    "answer": "65",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "23",
+      "42",
+      "65"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-29=60,x=?",
+    "answer": "89",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "29",
+      "60",
+      "89"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-41=41,x=?",
+    "answer": "82",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "41",
+      "41",
+      "82"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-46=53,x=?",
+    "answer": "99",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow0",
+    "fact_key": [
+      "add",
+      "46",
+      "53",
+      "99"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-13=48,x=?",
+    "answer": "61",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "13",
+      "48",
+      "61"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-16=37,x=?",
+    "answer": "53",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "16",
+      "37",
+      "53"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-17=44,x=?",
+    "answer": "61",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "17",
+      "44",
+      "61"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-26=27,x=?",
+    "answer": "53",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "26",
+      "27",
+      "53"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-28=48,x=?",
+    "answer": "76",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "28",
+      "48",
+      "76"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-34=47,x=?",
+    "answer": "81",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "34",
+      "47",
+      "81"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-35=49,x=?",
+    "answer": "84",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "35",
+      "49",
+      "84"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-37=44,x=?",
+    "answer": "81",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "37",
+      "44",
+      "81"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-39=57,x=?",
+    "answer": "96",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "39",
+      "57",
+      "96"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x-47=47,x=?",
+    "answer": "94",
+    "category": "x_minus_a",
+    "subskill": "subtrahend_2digit_borrow1",
+    "fact_key": [
+      "add",
+      "47",
+      "47",
+      "94"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "19*x=19,x=?",
+    "answer": "1",
+    "category": "a_times_x",
+    "subskill": "unknown_1digit_known_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "19",
+      "19"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "20*x=20,x=?",
+    "answer": "1",
+    "category": "a_times_x",
+    "subskill": "unknown_1digit_known_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "20",
+      "20"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "21*x=21,x=?",
+    "answer": "1",
+    "category": "a_times_x",
+    "subskill": "unknown_1digit_known_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "21",
+      "21"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "22*x=22,x=?",
+    "answer": "1",
+    "category": "a_times_x",
+    "subskill": "unknown_1digit_known_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "22",
+      "22"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "23*x=23,x=?",
+    "answer": "1",
+    "category": "a_times_x",
+    "subskill": "unknown_1digit_known_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "23",
+      "23"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "24*x=24,x=?",
+    "answer": "1",
+    "category": "a_times_x",
+    "subskill": "unknown_1digit_known_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "24",
+      "24"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "32*x=32,x=?",
+    "answer": "1",
+    "category": "a_times_x",
+    "subskill": "unknown_1digit_known_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "32",
+      "32"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "36*x=36,x=?",
+    "answer": "1",
+    "category": "a_times_x",
+    "subskill": "unknown_1digit_known_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "36",
+      "36"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "38*x=38,x=?",
+    "answer": "1",
+    "category": "a_times_x",
+    "subskill": "unknown_1digit_known_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "38",
+      "38"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "40*x=40,x=?",
+    "answer": "1",
+    "category": "a_times_x",
+    "subskill": "unknown_1digit_known_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "40",
+      "40"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "2*x=124,x=?",
+    "answer": "62",
+    "category": "a_times_x",
+    "subskill": "unknown_2digit_known_1digit",
+    "fact_key": [
+      "mul",
+      "2",
+      "62",
+      "124"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "3*x=159,x=?",
+    "answer": "53",
+    "category": "a_times_x",
+    "subskill": "unknown_2digit_known_1digit",
+    "fact_key": [
+      "mul",
+      "3",
+      "53",
+      "159"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "3*x=201,x=?",
+    "answer": "67",
+    "category": "a_times_x",
+    "subskill": "unknown_2digit_known_1digit",
+    "fact_key": [
+      "mul",
+      "3",
+      "67",
+      "201"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "4*x=252,x=?",
+    "answer": "63",
+    "category": "a_times_x",
+    "subskill": "unknown_2digit_known_1digit",
+    "fact_key": [
+      "mul",
+      "4",
+      "63",
+      "252"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "4*x=272,x=?",
+    "answer": "68",
+    "category": "a_times_x",
+    "subskill": "unknown_2digit_known_1digit",
+    "fact_key": [
+      "mul",
+      "4",
+      "68",
+      "272"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "6*x=282,x=?",
+    "answer": "47",
+    "category": "a_times_x",
+    "subskill": "unknown_2digit_known_1digit",
+    "fact_key": [
+      "mul",
+      "6",
+      "47",
+      "282"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "6*x=450,x=?",
+    "answer": "75",
+    "category": "a_times_x",
+    "subskill": "unknown_2digit_known_1digit",
+    "fact_key": [
+      "mul",
+      "6",
+      "75",
+      "450"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "7*x=364,x=?",
+    "answer": "52",
+    "category": "a_times_x",
+    "subskill": "unknown_2digit_known_1digit",
+    "fact_key": [
+      "mul",
+      "7",
+      "52",
+      "364"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "9*x=423,x=?",
+    "answer": "47",
+    "category": "a_times_x",
+    "subskill": "unknown_2digit_known_1digit",
+    "fact_key": [
+      "mul",
+      "9",
+      "47",
+      "423"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "9*x=684,x=?",
+    "answer": "76",
+    "category": "a_times_x",
+    "subskill": "unknown_2digit_known_1digit",
+    "fact_key": [
+      "mul",
+      "9",
+      "76",
+      "684"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "10*x=330,x=?",
+    "answer": "33",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "10",
+      "33",
+      "330"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "10*x=370,x=?",
+    "answer": "37",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "10",
+      "37",
+      "370"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "11*x=330,x=?",
+    "answer": "30",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "11",
+      "30",
+      "330"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "11*x=385,x=?",
+    "answer": "35",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "11",
+      "35",
+      "385"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "12*x=228,x=?",
+    "answer": "19",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "12",
+      "19",
+      "228"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "12*x=240,x=?",
+    "answer": "20",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "12",
+      "20",
+      "240"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "13*x=247,x=?",
+    "answer": "19",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "13",
+      "19",
+      "247"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "14*x=252,x=?",
+    "answer": "18",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "14",
+      "18",
+      "252"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "15*x=270,x=?",
+    "answer": "18",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "15",
+      "18",
+      "270"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "16*x=272,x=?",
+    "answer": "17",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "16",
+      "17",
+      "272"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "10*x=420,x=?",
+    "answer": "42",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "10",
+      "42",
+      "420"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "11*x=704,x=?",
+    "answer": "64",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "11",
+      "64",
+      "704"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "13*x=858,x=?",
+    "answer": "66",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "13",
+      "66",
+      "858"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "14*x=784,x=?",
+    "answer": "56",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "14",
+      "56",
+      "784"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "16*x=544,x=?",
+    "answer": "34",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "16",
+      "34",
+      "544"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "16*x=736,x=?",
+    "answer": "46",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "16",
+      "46",
+      "736"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "17*x=952,x=?",
+    "answer": "56",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "17",
+      "56",
+      "952"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "24*x=816,x=?",
+    "answer": "34",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "24",
+      "34",
+      "816"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "25*x=700,x=?",
+    "answer": "28",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "25",
+      "28",
+      "700"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "28*x=840,x=?",
+    "answer": "30",
+    "category": "a_times_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "28",
+      "30",
+      "840"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/2=52,x=?",
+    "answer": "104",
+    "category": "x_over_a",
+    "subskill": "divisor_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "2",
+      "52",
+      "104"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/2=79,x=?",
+    "answer": "158",
+    "category": "x_over_a",
+    "subskill": "divisor_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "2",
+      "79",
+      "158"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/5=64,x=?",
+    "answer": "320",
+    "category": "x_over_a",
+    "subskill": "divisor_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "5",
+      "64",
+      "320"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/5=67,x=?",
+    "answer": "335",
+    "category": "x_over_a",
+    "subskill": "divisor_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "5",
+      "67",
+      "335"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/5=78,x=?",
+    "answer": "390",
+    "category": "x_over_a",
+    "subskill": "divisor_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "5",
+      "78",
+      "390"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/6=48,x=?",
+    "answer": "288",
+    "category": "x_over_a",
+    "subskill": "divisor_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "6",
+      "48",
+      "288"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/7=79,x=?",
+    "answer": "553",
+    "category": "x_over_a",
+    "subskill": "divisor_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "7",
+      "79",
+      "553"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/8=75,x=?",
+    "answer": "600",
+    "category": "x_over_a",
+    "subskill": "divisor_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "8",
+      "75",
+      "600"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/8=78,x=?",
+    "answer": "624",
+    "category": "x_over_a",
+    "subskill": "divisor_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "8",
+      "78",
+      "624"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/9=51,x=?",
+    "answer": "459",
+    "category": "x_over_a",
+    "subskill": "divisor_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "9",
+      "51",
+      "459"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/17=1,x=?",
+    "answer": "17",
+    "category": "x_over_a",
+    "subskill": "divisor_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "17",
+      "17"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/22=1,x=?",
+    "answer": "22",
+    "category": "x_over_a",
+    "subskill": "divisor_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "22",
+      "22"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/25=1,x=?",
+    "answer": "25",
+    "category": "x_over_a",
+    "subskill": "divisor_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "25",
+      "25"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/27=1,x=?",
+    "answer": "27",
+    "category": "x_over_a",
+    "subskill": "divisor_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "27",
+      "27"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/28=1,x=?",
+    "answer": "28",
+    "category": "x_over_a",
+    "subskill": "divisor_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "28",
+      "28"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/29=1,x=?",
+    "answer": "29",
+    "category": "x_over_a",
+    "subskill": "divisor_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "29",
+      "29"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/30=1,x=?",
+    "answer": "30",
+    "category": "x_over_a",
+    "subskill": "divisor_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "30",
+      "30"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/33=1,x=?",
+    "answer": "33",
+    "category": "x_over_a",
+    "subskill": "divisor_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "33",
+      "33"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/35=1,x=?",
+    "answer": "35",
+    "category": "x_over_a",
+    "subskill": "divisor_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "35",
+      "35"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/39=1,x=?",
+    "answer": "39",
+    "category": "x_over_a",
+    "subskill": "divisor_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "39",
+      "39"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/10=35,x=?",
+    "answer": "350",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "10",
+      "35",
+      "350"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/11=19,x=?",
+    "answer": "209",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "11",
+      "19",
+      "209"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/11=24,x=?",
+    "answer": "264",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "11",
+      "24",
+      "264"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/11=32,x=?",
+    "answer": "352",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "11",
+      "32",
+      "352"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/11=36,x=?",
+    "answer": "396",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "11",
+      "36",
+      "396"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/13=30,x=?",
+    "answer": "390",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "13",
+      "30",
+      "390"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/14=14,x=?",
+    "answer": "196",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "14",
+      "14",
+      "196"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/14=23,x=?",
+    "answer": "322",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "14",
+      "23",
+      "322"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/18=18,x=?",
+    "answer": "324",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "18",
+      "18",
+      "324"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/18=22,x=?",
+    "answer": "396",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "18",
+      "22",
+      "396"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/12=38,x=?",
+    "answer": "456",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "12",
+      "38",
+      "456"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/13=55,x=?",
+    "answer": "715",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "13",
+      "55",
+      "715"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/14=31,x=?",
+    "answer": "434",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "14",
+      "31",
+      "434"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/14=44,x=?",
+    "answer": "616",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "14",
+      "44",
+      "616"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/15=30,x=?",
+    "answer": "450",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "15",
+      "30",
+      "450"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/15=57,x=?",
+    "answer": "855",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "15",
+      "57",
+      "855"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/16=36,x=?",
+    "answer": "576",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "16",
+      "36",
+      "576"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/17=31,x=?",
+    "answer": "527",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "17",
+      "31",
+      "527"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/24=33,x=?",
+    "answer": "792",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "24",
+      "33",
+      "792"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "x/31=32,x=?",
+    "answer": "992",
+    "category": "x_over_a",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "31",
+      "32",
+      "992"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "20/x=20,x=?",
+    "answer": "1",
+    "category": "a_over_x",
+    "subskill": "answer_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "20",
+      "20"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "23/x=23,x=?",
+    "answer": "1",
+    "category": "a_over_x",
+    "subskill": "answer_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "23",
+      "23"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "27/x=27,x=?",
+    "answer": "1",
+    "category": "a_over_x",
+    "subskill": "answer_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "27",
+      "27"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "28/x=28,x=?",
+    "answer": "1",
+    "category": "a_over_x",
+    "subskill": "answer_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "28",
+      "28"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "32/x=32,x=?",
+    "answer": "1",
+    "category": "a_over_x",
+    "subskill": "answer_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "32",
+      "32"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "35/x=35,x=?",
+    "answer": "1",
+    "category": "a_over_x",
+    "subskill": "answer_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "35",
+      "35"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "36/x=36,x=?",
+    "answer": "1",
+    "category": "a_over_x",
+    "subskill": "answer_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "36",
+      "36"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "38/x=38,x=?",
+    "answer": "1",
+    "category": "a_over_x",
+    "subskill": "answer_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "38",
+      "38"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "39/x=39,x=?",
+    "answer": "1",
+    "category": "a_over_x",
+    "subskill": "answer_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "39",
+      "39"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "40/x=40,x=?",
+    "answer": "1",
+    "category": "a_over_x",
+    "subskill": "answer_1digit_quotient_2digit",
+    "fact_key": [
+      "mul",
+      "1",
+      "40",
+      "40"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "204/x=4,x=?",
+    "answer": "51",
+    "category": "a_over_x",
+    "subskill": "answer_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "4",
+      "51",
+      "204"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "246/x=6,x=?",
+    "answer": "41",
+    "category": "a_over_x",
+    "subskill": "answer_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "6",
+      "41",
+      "246"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "252/x=6,x=?",
+    "answer": "42",
+    "category": "a_over_x",
+    "subskill": "answer_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "6",
+      "42",
+      "252"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "301/x=7,x=?",
+    "answer": "43",
+    "category": "a_over_x",
+    "subskill": "answer_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "7",
+      "43",
+      "301"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "329/x=7,x=?",
+    "answer": "47",
+    "category": "a_over_x",
+    "subskill": "answer_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "7",
+      "47",
+      "329"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "350/x=7,x=?",
+    "answer": "50",
+    "category": "a_over_x",
+    "subskill": "answer_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "7",
+      "50",
+      "350"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "355/x=5,x=?",
+    "answer": "71",
+    "category": "a_over_x",
+    "subskill": "answer_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "5",
+      "71",
+      "355"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "372/x=6,x=?",
+    "answer": "62",
+    "category": "a_over_x",
+    "subskill": "answer_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "6",
+      "62",
+      "372"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "504/x=7,x=?",
+    "answer": "72",
+    "category": "a_over_x",
+    "subskill": "answer_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "7",
+      "72",
+      "504"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "702/x=9,x=?",
+    "answer": "78",
+    "category": "a_over_x",
+    "subskill": "answer_2digit_quotient_1digit",
+    "fact_key": [
+      "mul",
+      "9",
+      "78",
+      "702"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "100/x=10,x=?",
+    "answer": "10",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "10",
+      "10",
+      "100"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "110/x=10,x=?",
+    "answer": "11",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "10",
+      "11",
+      "110"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "140/x=10,x=?",
+    "answer": "14",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "10",
+      "14",
+      "140"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "168/x=12,x=?",
+    "answer": "14",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "12",
+      "14",
+      "168"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "238/x=14,x=?",
+    "answer": "17",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "14",
+      "17",
+      "238"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "286/x=11,x=?",
+    "answer": "26",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "11",
+      "26",
+      "286"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "330/x=15,x=?",
+    "answer": "22",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "15",
+      "22",
+      "330"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "360/x=18,x=?",
+    "answer": "20",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "18",
+      "20",
+      "360"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "372/x=12,x=?",
+    "answer": "31",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "12",
+      "31",
+      "372"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "378/x=14,x=?",
+    "answer": "27",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_100_400",
+    "fact_key": [
+      "mul",
+      "14",
+      "27",
+      "378"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "416/x=13,x=?",
+    "answer": "32",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "13",
+      "32",
+      "416"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "484/x=11,x=?",
+    "answer": "44",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "11",
+      "44",
+      "484"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "564/x=12,x=?",
+    "answer": "47",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "12",
+      "47",
+      "564"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "649/x=11,x=?",
+    "answer": "59",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "11",
+      "59",
+      "649"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "672/x=16,x=?",
+    "answer": "42",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "16",
+      "42",
+      "672"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "819/x=21,x=?",
+    "answer": "39",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "21",
+      "39",
+      "819"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "851/x=23,x=?",
+    "answer": "37",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "23",
+      "37",
+      "851"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "936/x=24,x=?",
+    "answer": "39",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "24",
+      "39",
+      "936"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "954/x=18,x=?",
+    "answer": "53",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "18",
+      "53",
+      "954"
+    ],
+    "seen_status": "seen"
+  },
+  {
+    "prompt": "975/x=13,x=?",
+    "answer": "75",
+    "category": "a_over_x",
+    "subskill": "both_2digit_product_401_999",
+    "fact_key": [
+      "mul",
+      "13",
+      "75",
+      "975"
+    ],
+    "seen_status": "seen"
+  }
+]
