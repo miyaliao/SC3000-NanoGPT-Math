@@ -71,13 +71,19 @@ def inputs():
     return rows,meta,m,protected
 
 
-def mine(mode,device,max_new_tokens,pilot_per_category):
+def mine(mode,device,max_new_tokens,pilot_per_category,resume=False,max_questions_per_job=0):
     import torch
     from model import GPT,GPTConfig
     from evaluate_ta_integer import greedy_original_stop
     rows,meta,m,protected=inputs()
     dest=OUT/mode
-    if dest.exists():raise FileExistsError(f"Refuse overwrite {dest}")
+    if resume:
+        if mode != "full" or not (dest/"progress.json").is_file():
+            raise RuntimeError("--resume requires incomplete full/progress.json")
+        if (dest/"manifest.json").exists():
+            raise RuntimeError("Mining is already complete; refusing resume")
+    elif dest.exists():
+        raise FileExistsError(f"Refuse overwrite existing mining output {dest}")
     if device=="cuda" and not torch.cuda.is_available():
         raise RuntimeError("Run GPU inference through Slurm allocation")
     index={}
@@ -108,6 +114,11 @@ def mine(mode,device,max_new_tokens,pilot_per_category):
         print(f"MINE {cat:12} eligible={len(cur):5} selected={len(take):5}",flush=True)
     rng.shuffle(selected)
     print(f"Unique eligible train prompts: {len(index)}; running {len(selected)}",flush=True)
+    selection_sha256=hashlib.sha256(blob([r["prompt"] for r in selected])).hexdigest()
+    source_sha256=m["files_sha256"]["structured"]
+    metadata_sha256=m["files_sha256"]["structured_metadata"]
+    base_sha256=sha(BASE)
+    dest.mkdir(parents=True,exist_ok=False) if not resume else None
     with (ROOT/"sft/meta.pkl").open("rb") as f:
         meta_vocab=pickle.load(f)
     stoi,itos=meta_vocab["stoi"],meta_vocab["itos"]
@@ -117,11 +128,45 @@ def mine(mode,device,max_new_tokens,pilot_per_category):
                            checkpoint.get("model_state_dict",checkpoint.get("model")).items()},
                           strict=True)
     model.to(device).eval()
-    errors=[]
-    counts=Counter()
-    percat=defaultdict(Counter)
-    previews=[]
-    for i,r in enumerate(selected,1):
+    progress_path=dest/"progress.json"
+    if resume:
+        progress=read(progress_path)
+        expected={"mode":mode,"source_structured_sha256":source_sha256,
+                  "source_metadata_sha256":metadata_sha256,
+                  "base_checkpoint_sha256":base_sha256,
+                  "selected_prompt_sha256":selection_sha256,
+                  "max_new_tokens":max_new_tokens,
+                  "total_selected":len(selected)}
+        if any(progress.get(k)!=v for k,v in expected.items()):
+            raise RuntimeError("Resume checkpoint does not match frozen selection/model/data")
+        processed=progress["processed"]
+        if not 0 <= processed <= len(selected):raise RuntimeError("Corrupt progress offset")
+        errors=progress["errors"]
+        counts=Counter(progress["counts"])
+        percat=defaultdict(Counter,{k:Counter(v) for k,v in progress["by_category"].items()})
+        previews=progress["previews"]
+        print(f"RESUME {processed}/{len(selected)} usable_wrong={len(errors)}",flush=True)
+    else:
+        processed=0
+        errors=[]
+        counts=Counter()
+        percat=defaultdict(Counter)
+        previews=[]
+    def checkpoint(step):
+        state={"version":"round9_mining_progress_v1","mode":mode,
+               "source_structured_sha256":source_sha256,
+               "source_metadata_sha256":metadata_sha256,
+               "base_checkpoint_sha256":base_sha256,
+               "selected_prompt_sha256":selection_sha256,
+               "max_new_tokens":max_new_tokens,"total_selected":len(selected),
+               "processed":step,"errors":errors,"counts":dict(counts),
+               "by_category":{k:dict(v) for k,v in percat.items()},
+               "previews":previews}
+        temp=progress_path.with_suffix(".json.tmp")
+        temp.write_bytes(blob(state))
+        temp.replace(progress_path)
+    if not resume:checkpoint(0)
+    for i,r in enumerate(selected[processed:],processed+1):
         if set(r["prompt"])-set(stoi):raise ValueError("Tokenizer OOV")
         completion,stop=greedy_original_stop(
             model,r["prompt"],stoi,itos,max_new_tokens,device)
@@ -144,12 +189,21 @@ def mine(mode,device,max_new_tokens,pilot_per_category):
         if len(previews)<24 and (eligible or len(previews)<6):
             previews.append({"prompt":r["prompt"],"gold":r["answer"],
                              "completion":completion,"eligible":eligible,"status":status})
-        if i%200==0:print(f"PROGRESS {i}/{len(selected)} usable_wrong={len(errors)}",flush=True)
+        if i%200==0:
+            checkpoint(i)
+            print(f"PROGRESS {i}/{len(selected)} usable_wrong={len(errors)}",flush=True)
+        if max_questions_per_job and i-processed>=max_questions_per_job:
+            checkpoint(i)
+            if i<len(selected):
+                print(f"PARTIAL {i}/{len(selected)} usable_wrong={len(errors)}; "
+                      "submit 'sbatch scripts/round9_mine.sbatch full --resume' to continue",flush=True)
+                return
+    checkpoint(len(selected))
     outm={
         "version":"round9_mined_v1","mode":mode,
-        "source_structured_sha256":m["files_sha256"]["structured"],
-        "source_metadata_sha256":m["files_sha256"]["structured_metadata"],
-        "base_checkpoint_sha256":sha(BASE),
+        "source_structured_sha256":source_sha256,
+        "source_metadata_sha256":metadata_sha256,
+        "base_checkpoint_sha256":base_sha256,
         "max_new_tokens":max_new_tokens,"decode":"greedy original-stop",
         "eligible_unique_training_prompts":len(index),
         "evaluated_unique_prompts":len(selected),"usable_wrong_unique":len(errors),
@@ -157,9 +211,8 @@ def mine(mode,device,max_new_tokens,pilot_per_category):
         "by_category":{cat:dict(percat[cat]) for cat in KINDS},
         "previews":previews,"errors_sha256":hashlib.sha256(blob(errors)).hexdigest()
     }
-    dest.mkdir(parents=True,exist_ok=False)
-    (dest/"errors.json").write_bytes(blob(errors))
-    (dest/"manifest.json").write_bytes(blob(outm))
+    with (dest/"errors.json").open("xb") as f:f.write(blob(errors))
+    with (dest/"manifest.json").open("xb") as f:f.write(blob(outm))
     print(f"MINE PASS mode={mode}, usable={len(errors)}/{len(selected)} => {dest}")
 
 
@@ -245,13 +298,18 @@ def main():
     p.add_argument("--device",choices=("cpu","cuda"),default="cuda")
     p.add_argument("--max-new-tokens",type=int,default=80)
     p.add_argument("--pilot-per-category",type=int,default=50)
+    p.add_argument("--resume",action="store_true",
+                   help="Continue interrupted full mining using audited progress.json")
+    p.add_argument("--max-questions-per-job",type=int,default=0,
+                   help="Optional chunk cap; 0 means finish all selected questions")
     args=p.parse_args()
     if bool(args.mine)==bool(args.assemble):
         p.error("Choose exactly one of --mine pilot|full or --assemble")
-    if args.pilot_per_category<1 or args.max_new_tokens<1:
+    if args.pilot_per_category<1 or args.max_new_tokens<1 or args.max_questions_per_job<0:
         p.error("Positive limits required")
     if args.assemble:assemble()
-    else:mine(args.mine,args.device,args.max_new_tokens,args.pilot_per_category)
+    else:mine(args.mine,args.device,args.max_new_tokens,args.pilot_per_category,
+              resume=args.resume,max_questions_per_job=args.max_questions_per_job)
 
 
 if __name__=="__main__":main()
