@@ -127,6 +127,25 @@ def compare_all(checkpoints,output):
     write_once(dest,report)
     print(f"COMPARISON PASS {dest}",flush=True)
 
+def metrics_from_predictions(preds):
+    """Recover a complete metric report if killed after writing predictions."""
+    from collections import Counter,defaultdict
+    counts=Counter(x["status"] for x in preds)
+    stops=Counter(x["stop_reason"] for x in preds)
+    groups=defaultdict(Counter)
+    for x in preds:groups[x["category"]][x["status"]]+=1
+    n=len(preds)
+    return {
+        "n":n,"correct":counts["correct"],
+        "accuracy":counts["correct"]/n,
+        "math_error":counts["math_error"],
+        "format_failure":counts["format_failure"],
+        "valid_explanations":sum(x["explanation_valid"] for x in preds),
+        "stops":dict(stops),
+        "by_category":{k:dict(v) for k,v in sorted(groups.items())}
+    }
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--device",choices=("cpu","cuda"),default="cuda")
@@ -184,8 +203,15 @@ def main():
                 if sum(x["status"]=="correct" for x in preds)!=metrics["correct"]:
                     raise RuntimeError(f"{label}/{name} saved score mismatch")
                 print(f"SKIP completed {label}/{name}",flush=True)
-            elif summarypath.exists() or predpath.exists():
-                raise RuntimeError(f"Incomplete {label}/{name} eval files; inspect instead of overwriting")
+            elif predpath.exists() and not summarypath.exists():
+                preds=read(predpath)
+                if len(preds)!=EXPECTED_SPLITS[name]:
+                    raise RuntimeError(f"Partial or corrupt saved predictions for {label}/{name}")
+                metrics=metrics_from_predictions(preds)
+                write_once(summarypath,metrics)
+                print(f"RECOVER metrics {label}/{name} from saved predictions",flush=True)
+            elif summarypath.exists():
+                raise RuntimeError(f"Missing {label}/{name} predictions; inspect before retrying")
             else:
                 metrics,preds=score(model,records,stoi,itos,args.device,80)
                 write_once(predpath,preds)
