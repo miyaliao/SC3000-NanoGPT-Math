@@ -96,6 +96,7 @@ def eligible_generated(protected):
 
 def roll(pool, rng, prompt_uses, fact_uses, pcap, fcap):
     # Static weighted distribution; hard exposure caps checked after each proposal.
+    if not pool:raise RuntimeError("No eligible candidates in requested category/stratum")
     weights=[(3.0 if rec["carry"] else 1.0) *
              (0.15 if 1 in tuple(map(int,rec["fact"][1:3])) else 1.0)
              for rec in pool]
@@ -120,9 +121,24 @@ def select_targeted(old_records,protected,teacher):
     additive={}
     for rec in old_records:
         if rec["category"] in ADD:additive.setdefault(rec["prompt"],rec)
-    if len(additive)<8000:
-        raise RuntimeError(f"Only {len(additive)} distinct additive replay prompts; can't select unique 8000")
-    selected_add=rng.sample(list(additive.values()),8000)
+    selected_add=rng.sample(list(additive.values()),min(8000,len(additive)))
+    if len(selected_add)<8000:
+        # Even replay must have a strict cap: do not silently fill 8k with one fact.
+        need=8000-len(selected_add)
+        seen_prompts=Counter(x["prompt"] for x in selected_add)
+        pool=list(additive.values())
+        rng.shuffle(pool)
+        while need:
+            found=False
+            for x in pool:
+                if need==0:break
+                if seen_prompts[x["prompt"]]>=5:continue
+                selected_add.append(x)
+                seen_prompts[x["prompt"]]+=1
+                need-=1
+                found=True
+            if not found:raise RuntimeError("Insufficient additive prompts under 5 exposures per prompt")
+    print(f"ADDITIVE sampled=8000 unique_prompts={len(additive)}",flush=True)
     # Reuse historical TRAIN examples and generate additional TRAIN-only surface prompts.
     pools=eligible_generated(protected)
     for rec in old_records:
