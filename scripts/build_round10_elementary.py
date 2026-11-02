@@ -116,7 +116,7 @@ def roll(pool, rng, prompt_uses, fact_uses, pcap, fcap):
     prompt_uses[item["prompt"]]+=1;fact_uses[tuple(item["fact"])]+=1
     return item
 
-def select_targeted(old_records,protected,teacher):
+def select_targeted(old_records,protected,replay_protected):
     rng=random.Random(SEED)
     additive={}
     for rec in old_records:
@@ -141,10 +141,22 @@ def select_targeted(old_records,protected,teacher):
     print(f"ADDITIVE sampled=8000 unique_prompts={len(additive)}",flush=True)
     # Reuse historical TRAIN examples and generate additional TRAIN-only surface prompts.
     pools=eligible_generated(protected)
+    # Teacher680 contains HISTORICALLY SEEN facts. Replaying such facts
+    # already present in original Random is permissible for retention, but
+    # NEW synthetic candidates still exclude Teacher680 as above.
+    # Always exclude reserved/public/Val/OOD/Extended facts from replay
+    # (including any overlap with teacher facts).
+    replayed_teacher=0
     for rec in old_records:
-        if rec["category"] in MULT and tuple(rec["fact"]) not in protected and \
-           stable_split(rec["fact"],42)=="train":
+        key=tuple(rec["fact"])
+        if rec["category"] in MULT and key not in replay_protected and \
+           stable_split(key,42)=="train":
+            if rec["prompt"] not in pools and key in protected:
+                replayed_teacher+=1
             pools.setdefault(rec["prompt"],rec)
+    print(f"REPLAY candidates from historical Teacher680 facts="
+          f"{replayed_teacher} unique surface prompts; "
+          f"new synthetic candidates still protect all teacher facts",flush=True)
     grouped=defaultdict(list)
     for rec in pools.values():
         if rec["category"] in MULT and rec["bin"] in QUOTA:
@@ -305,11 +317,19 @@ def main():
     if args.build and OUT.exists():raise FileExistsError(OUT)
     old,old_records=source()
     core,ext,_,_=validate_680()
-    seen,protected,_=source_and_protected()
-    protected.update(tuple(x["fact_key"]) for x in core+ext)
+    seen,replay_protected,_=source_and_protected()
+    # Keep the distinction between historical Seen Teacher680 facts and
+    # forbidden reserved/public/existing dev facts.
+    protected=set(replay_protected)
+    teacher_keys={tuple(x["fact_key"]) for x in core+ext}
+    protected.update(teacher_keys)
     rng=random.Random(SEED+1)
     control=[old[i] for i in rng.sample(range(len(old)),20000)]
-    chosen,detail,uses,fact_uses=select_targeted(old_records,protected,core+ext)
+    chosen,detail,uses,fact_uses=select_targeted(old_records,protected,replay_protected)
+    reused_teacher_rows=sum(
+        x["bin"]!="additive" and tuple(x["fact"]) in teacher_keys for x in chosen)
+    print(f"TEACHER680 historical-seen replay rows={reused_teacher_rows}; "
+          f"teacher benchmark is NOT unseen-fact OOD",flush=True)
     targeted=[{"positive":x["positive"],"negative":x["negative"]} for x in chosen]
     if len(targeted)!=len(control):raise RuntimeError("Unmatched 20k")
     # Explicit retained 5 instructor/public probes; never train on their facts in new rows.
@@ -332,6 +352,8 @@ def main():
         "basic_probe_n":len(benchmark),
         "basic_probe_distinct_facts":len({tuple(x["fact_key"]) for x in benchmark}),
         "reserved_probes_n":len(probes),
+        "replayed_historical_teacher680_rows":reused_teacher_rows,
+        "new_synthetic_teacher680_facts_excluded":True,
         "files_sha256":{}
     }
     files={"control_pairs.json":control,"targeted_pairs.json":targeted,
