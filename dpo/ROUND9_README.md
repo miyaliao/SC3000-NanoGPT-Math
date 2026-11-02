@@ -178,3 +178,86 @@ Job monitoring (substitute the actual printed job ID):
 A longer run should not be justified solely by validation-set tuning:
 avoid selecting epochs using the sealed Test, and report potential
 validation selection bias if choosing the best among several snapshots.
+
+## Round10 — Elementary multiplication/division curriculum (E5 start)
+
+Experiment purpose: improve basic multiplication (e.g. reserved probe
+`3*17=?`, gold 51) **without copying that fact into the new training data**.
+The original 100k Round9 Random dataset contains 59,648 multiplicative
+exposures: 3,340 product<10, 10,510 product10..99 and 45,798
+product100..999 (76.78% of multiplication-derived records). It has only
+1,395 distinct canonical multiplication facts in 59,648 rows.
+
+New **matched** 20,000-row arms, both starting from FROZEN E5:
+- Control: independently sample 20,000 original Random training rows
+  (replay). The source contains duplicates; sampling row indices without
+  replacement is NOT full prompt/fact deduplication.
+- Targeted: 8,000 additive/inverse replay (prefer 8k unique prompts), plus
+  **670** product<10, **6,720** product10..99, **4,610** product100..999.
+  All six multiplicative task families are represented. Direct multiply
+  receives a larger 2-digit share. Aim for ~35% carry exposure in 2-digit
+  products with hard >=30% check (carry = one-digit multiplier 2..9 ×
+  two-digit factor with ones-column product >=10). We keep the same
+  answer-first because Chosen, refusal Rejected, character tokenizer,
+  and instructor full-sequence-mean Course Loss.
+  The generator prevents non-TRAIN canonical facts/older protected test
+  facts from entering newly generated rows. An exact prompt is limited
+  to 15 exposures for product<10, 10 for product10..99, and 3 for
+  product100..999; across surface forms, a canonical fact is limited to
+  100, 70, or 20 exposures, respectively. These are NON-ZERO repeats:
+  total deduplication is impossible at 20k because there are only 241
+  distinct positive unordered product<=99 facts (228 with product10..99).
+  This is an explicit capped-reuse curriculum, not a no-repeat set.
+
+**Protocol:** one new AdamW from E5 weight-only checkpoint per arm; LR
+3e-6, batch64, 4 continuous epochs of 312 full updates each,
+same seed42 and one continuous cosine schedule per run. Both arms save
+separate `epoch_t01.pt`.. `epoch_t04.pt`, optimizer/scheduler/RNG
+state after each epoch, and final `train_manifest.json`.
+Never modify E5, old Random source, or sealed Round3 final Test.
+
+**Run in TC1 with activated venv**:
+
+    cd ~/NanoGPT-Math
+    git status --short
+    git pull --ff-only origin round9-balanced-self-hardneg
+    source .venv/bin/activate
+
+    # Verify CPU allocation + difficulty/carry quotas BEFORE writing:
+    python scripts/build_round10_elementary.py --verify-only
+    python scripts/build_round10_elementary.py --build
+
+    python scripts/train_round10_elementary.py --arm control --device cpu --check-only
+    python scripts/train_round10_elementary.py --arm targeted --device cpu --check-only
+
+    # GPU Smoke (one Slurm job at a time, with separate output dirs)
+    sbatch scripts/round10_train.sbatch control --smoke
+    sbatch scripts/round10_train.sbatch targeted --smoke
+
+    # Formal four-epoch jobs (submit only when previous GPU job exits):
+    sbatch scripts/round10_train.sbatch control
+    sbatch scripts/round10_train.sbatch targeted
+
+    # If a formal training job stops after one or more COMPLETE epochs:
+    sbatch scripts/round10_train.sbatch control --resume
+    sbatch scripts/round10_train.sbatch targeted --resume
+
+    # Finally, after BOTH train_manifest.json files exist:
+    python scripts/eval_round10_elementary.py --check-only
+    sbatch scripts/round10_eval.sbatch
+    # If an eval job is interrupted, rerun same sbatch to skip saved splits.
+
+The evaluation task runs **after all snapshots have been trained**:
+E5 and T1..T4 of Control/Targeted, on frozen Val768, TrainProbe256,
+Teacher680, five immutable RESERVED teacher probes, and a small
+optional TRAIN-history-unseen elementary benchmark from the original
+VAL math-fact partition. This new benchmark can be much smaller than 60
+prompts because the elementary unique fact universe is very small; the
+actual sample count and distinct fact count are in the data manifest.
+It does not read OOD256, Extended384, or the sealed independent Test768.
+
+Results: `dpo/experiments/round10_joint_eval/comparison.json`
+with per-split paired E5-vs-Control, E5-vs-Targeted and Control-vs-Targeted
+results plus Val768 per-category direct multiply/divide/x_over_a.
+Claim improvement ONLY after training and evaluating on TC1; no
+evaluation outcomes are embedded in the generator.
