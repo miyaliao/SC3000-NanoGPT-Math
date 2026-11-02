@@ -34,7 +34,7 @@ jobs:
           for src,c in code:
               if 'BUNDLED_GENERATOR_SOURCE = {}' in src:
                   snapshots={}
-              elif c.get("metadata",{}).get("tags")==["embedded-data-generator","task-1"]:
+              elif c.get("metadata",{}).get("tags")==["embedded-data-generator","step-5"]:
                   exec(compile(src,"embedded-generator","exec"),{"BUNDLED_GENERATOR_SOURCE":snapshots})
           assert len(snapshots)>=12
           for path,source in snapshots.items():
@@ -78,6 +78,22 @@ jobs:
               ("round9_random_e1",1,1),("round9_random_e2_restart",1,1),
               ("round9_random_e3_e5_from_e2",3,4)]
           assert sorted(x.name for x in pathlib.Path("dpo").glob("*.ipynb"))==["dpo.ipynb"]
+          headings=["".join(c["source"]).splitlines()[0] for c in cells
+                    if c["cell_type"]=="markdown" and
+                       "".join(c["source"]).startswith("### Step ")]
+          expected_prefixes=[
+              "### Step 1: Install", "### Step 2: Package imports",
+              "### Step 3: Define helper functions",
+              "### Step 4: Load the pretrained NanoGPT model",
+              "### Step 5: Load Data", "### Step 6: Build the optimizer",
+              "### Step 7: Begin training", "### Step 8: Begin testing"]
+          assert len(headings)==8 and all(
+              x.startswith(p) for x,p in zip(headings,expected_prefixes)
+          ), headings
+          assert not any("### Task " in "".join(c["source"])
+                         for c in cells if c["cell_type"]=="markdown")
+          assert "def build_optimizer_scheduler(" in all_source
+          assert "build_optimizer_scheduler(gpt,spec" in all_source
           assert "FINAL_EXPORT_POLICY = \"archived_if_available\"" in all_source
           assert "FAST_SMOKE = False" in all_source
           print("NOTEBOOK STATIC CONTRACT PASS:",
