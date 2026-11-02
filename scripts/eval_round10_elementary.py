@@ -19,6 +19,26 @@ from build_round10_elementary import OUT as DATA,E5,sha,read
 from train_round3_course import score,write_once
 from compare_round9 import paired,inspect
 from evaluate_teacher_style_680 import validate as validate680
+from generate_round1 import parse_relation
+
+MUL_CATS=("multiply","divide","x_times_a","a_times_x","x_over_a","a_over_x")
+
+def basic_slices(val_predictions):
+    """Read-only subgroups OF Val768, not an independent extra benchmark."""
+    groups={"product_10_99":[], "direct_multiply_10_99":[],
+            "carry_10_99":[]}
+    for item in val_predictions:
+        if item["category"] not in MUL_CATS:continue
+        fact=parse_relation(item["prompt"],str(item["answer"]))
+        if fact[0]!="mul":raise RuntimeError("Val product category mismatched fact")
+        if not 10<=int(fact[3])<=99:continue
+        groups["product_10_99"].append(item)
+        if item["category"]=="multiply":
+            groups["direct_multiply_10_99"].append(item)
+        a,b=map(int,fact[1:3])
+        if 2<=a<=9 and b>=10 and a*(b%10)>=10:
+            groups["carry_10_99"].append(item)
+    return groups
 
 EXP=ROOT/"dpo/experiments"
 OUTPUT=EXP/"round10_joint_eval"
@@ -113,6 +133,41 @@ def compare(models,tasks):
             print(f"RESULT {name:15} {split:15} {stat['correct']}/{stat['n']}",flush=True)
             if name=="e5" and split in KNOWN_E5 and stat["correct"]!=KNOWN_E5[split]:
                 raise RuntimeError(f"E5 evaluation regression {split}: {stat['correct']}")
+    # Extra basic skills are strictly diagnostic slices of the SAME frozen
+    # Val768 predictions. They share questions with Val and are NOT
+    # independent validation samples or an additional testing source.
+    subgroup_names=("product_10_99","direct_multiply_10_99","carry_10_99")
+    report["val_basic_diagnostics"]={
+        "description":"Subgroups of frozen Val768 only; counts overlap Val768, not independent",
+        "models":{},"paired":{}
+    }
+    subgroups={}
+    for name in models:
+        subgroups[name]=basic_slices(results[name]["val"])
+        report["val_basic_diagnostics"]["models"][name]={}
+        for group in subgroup_names:
+            records=subgroups[name][group]
+            report["val_basic_diagnostics"]["models"][name][group]=(
+                inspect(records) if records else {"correct":0,"n":0,"accuracy":None})
+            n=len(records)
+            print(f"VAL BASIC {name:15} {group:24} "
+                  f"{sum(x['status']=='correct' for x in records)}/{n}",
+                  flush=True)
+    for t in range(1,5):
+        key=f"t{t}"
+        report["val_basic_diagnostics"]["paired"][key]={}
+        for group in subgroup_names:
+            old=subgroups["e5"][group]
+            control=subgroups[f"control_t{t}"][group]
+            targeted=subgroups[f"targeted_t{t}"][group]
+            if not old:
+                report["val_basic_diagnostics"]["paired"][key][group]=None
+                continue
+            report["val_basic_diagnostics"]["paired"][key][group]={
+                "e5_vs_control":paired(old,control),
+                "e5_vs_targeted":paired(old,targeted),
+                "control_vs_targeted":paired(control,targeted)
+            }
     for t in range(1,5):
         c=f"control_t{t}";h=f"targeted_t{t}"
         report["paired"][f"t{t}"]={}
