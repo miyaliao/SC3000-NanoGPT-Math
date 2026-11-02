@@ -96,6 +96,19 @@ jobs:
           assert "build_optimizer_scheduler(gpt,spec" in all_source
           assert "FINAL_EXPORT_POLICY = \"archived_if_available\"" in all_source
           assert "FAST_SMOKE = False" in all_source
+          instructor=json.loads(pathlib.Path("dpo/reference_course_notebook_v1.json").read_text(encoding="utf-8"))
+          orig=instructor["cells"][15]
+          import re
+          original_test=re.search(r'^test_set = \[.*\]
+          print("NOTEBOOK STATIC CONTRACT PASS:",
+                len(code),"Python cells,",len(snapshots),
+                "complete source snapshots; no GPU execution claimed")
+          PY
+, "".join(orig["source"]), re.M).group(0)
+          restored=[src for src,c in code if "ORIGINAL instructor test prompts" in src]
+          assert len(restored)==1 and original_test in restored[0], "Original teacher Step8 test_set changed"
+          assert "print(prompt + completion)" in restored[0]
+          print("ORIGINAL INSTRUCTOR STEP8 TEST SET PRESERVED")
           print("NOTEBOOK STATIC CONTRACT PASS:",
                 len(code),"Python cells,",len(snapshots),
                 "complete source snapshots; no GPU execution claimed")
