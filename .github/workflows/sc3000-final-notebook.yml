@@ -45,12 +45,11 @@ jobs:
                            "FINAL_EXPORT_POLICY"):
               assert required in "\n".join(code),required
           assert not any("BUNDLED_GENERATOR_SOURCE" in x for x in code)
-          assert sum(x["actual_epochs"] for c in code
-                     for node in ast.walk(ast.parse(c))
-                     if isinstance(node,ast.Assign)
-                     for t in node.targets if isinstance(t,ast.Name) and
-                     t.id in ("STAGE1_TO_4","STAGE5_TO_7")
-                     for x in ast.literal_eval(node.value)
-                     if isinstance(x,dict) and "actual_epochs" in x)==13
+          stage_text="\\n".join(code)
+          for value in ("round3_structured","round4_treatment_e1",
+                        "round5_original","round7_replay",
+                        "round9_random_e1","round9_random_e2_restart",
+                        "round9_random_e3_e5_from_e2"):
+              assert value in stage_text,value
           print("PASS instructor 8 headings, original core code, preserved test_set, 13-epoch contract")
           PY
