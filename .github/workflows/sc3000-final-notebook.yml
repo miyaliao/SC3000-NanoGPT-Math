@@ -63,3 +63,49 @@ jobs:
               assert rows==ns["make_preference_pairs"](120,seed)
           print("PASS: instructor Steps 1–8, exact original test_set, Python code, Task1 generator")
           PY
+
+  cpu-notebook-smoke:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install CPU PyTorch for notebook pipeline smoke
+        run: python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.6.0
+      - name: Create disposable original-architecture SFT input
+        run: |
+          python - <<'PY'
+          import torch
+          from model import GPT,GPTConfig
+          torch.set_num_threads(2)
+          args=dict(n_layer=6,n_head=6,n_embd=348,block_size=256,
+                    vocab_size=74,dropout=0.2,bias=False)
+          model=GPT(GPTConfig(**args))
+          torch.save({"model":model.state_dict(),"model_args":args},"sft/gpt.pt")
+          print("Created disposable test-only initial weights")
+          PY
+      - name: Run EVERY notebook code cell in source order with tiny smoke settings
+        run: |
+          python - <<'PY'
+          import json,pathlib,torch
+          torch.set_num_threads(2)
+          nb=json.loads(pathlib.Path("dpo/dpo.ipynb").read_text())
+          namespace={"__name__":"__main__"}
+          for index,c in enumerate(nb["cells"]):
+              if c["cell_type"]!="code":continue
+              s="".join(c["source"])
+              s=s.replace("FAST_SMOKE = False","FAST_SMOKE = True")
+              s=s.replace('TRAINING_POLICY = "auto"', 'TRAINING_POLICY = "course"')
+              s=s.replace("MAX_NEW_TOKENS = 80","MAX_NEW_TOKENS = 12")
+              print("EXECUTE CELL",index,s[:60].replace("\n"," "),flush=True)
+              exec(compile(s,f"notebook-cell-{index}","exec"),namespace)
+          assert namespace["TRAIN_MODE"]=="course"
+          assert namespace["DATA_ORIGIN"]=="notebook_generated_from_math_facts"
+          assert namespace["measured"]["instructor_examples"]["n"]==5
+          assert (pathlib.Path("dpo/experiments/final_notebook_smoke/smoke_course.pt")).is_file()
+          assert not pathlib.Path("dpo/dpo.pt").exists(),"Smoke must never replace formal submission"
+          print("END-TO-END CPU SMOKE PASS: Step1-8, data synthesis, loss, checkpoint and teacher tests")
+          PY
