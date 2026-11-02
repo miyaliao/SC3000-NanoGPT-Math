@@ -1,0 +1,27 @@
+name: Round9 Python syntax
+on:
+  push:
+    branches: [round9-balanced-self-hardneg]
+  pull_request:
+    paths:
+      - 'scripts/build_round9_data.py'
+      - 'scripts/mine_round9_hardneg.py'
+      - 'scripts/train_round9.py'
+      - 'scripts/compare_round9.py'
+      - 'scripts/train_round9_random_e2.py'
+      - 'scripts/compare_round9_random_e2.py'
+      - 'scripts/train_round9_random_multi.py'
+      - 'scripts/eval_round9_random_multi.py'
+      - 'scripts/audit_round10_mul_rebalance.py'
+      - 'scripts/build_round10_elementary.py'
+      - 'scripts/train_round10_elementary.py'
+      - 'scripts/eval_round10_elementary.py'
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: python -m py_compile scripts/build_round9_data.py scripts/mine_round9_hardneg.py scripts/train_round9.py scripts/compare_round9.py scripts/train_round9_random_e2.py scripts/compare_round9_random_e2.py scripts/train_round9_random_multi.py scripts/eval_round9_random_multi.py scripts/audit_round10_mul_rebalance.py scripts/build_round10_elementary.py scripts/train_round10_elementary.py scripts/eval_round10_elementary.py
