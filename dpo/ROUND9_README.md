@@ -113,3 +113,68 @@ scripts/round9_mine.sbatch and scripts/round9_train.sbatch — TC1 runners.
     python scripts/compare_round9_random_e2.py
 
 Outputs under `dpo/experiments/round9_random_e2_restart/` include `dpo.pt`, `summary.json`, all frozen predictions, and `paired_vs_random_e1.json` (comparison script). Stop further training if new Val768 gain is small or fact-disjoint OOD/Extended regresses materially. Do not use the sealed Round3 final Test for choosing this checkpoint.
+
+## Multi-epoch Random E3–E6: checkpoint EACH epoch, evaluate AFTER training
+
+As of 2026-11-02, completed E2 baseline from E1 Restarted Continuation:
+TrainProbe256 216, Val768 582, OOD256 112, Extended384 180,
+Teacher680 493, Direct128 32. E2 at
+`dpo/experiments/round9_random_e2_restart/dpo.pt` is immutable.
+
+**Training plan:** 4 EXTRA epochs (E3, E4, E5, E6), 100k *same* Random
+positive/negative pairs, batch64, lr=1e-5, original Course Loss, seed42.
+Initialize from the frozen Random E2 weights, initialize a *new* AdamW and
+CosineAnnealingLR once, then keep both continuously across E3–E6 (total
+4×1562 updates, not a scheduler reset at each epoch). E2 did not save optimizer
+state, therefore E2→E3 is a restarted continuation, but E3→E4→E5→E6
+does preserve continuous AdamW/scheduler state inside this run.
+
+Separate train/evaluate Slurm jobs respect TC1's 6-hour per-job QoS limit.
+The TRAIN script performs no evaluation inference: saves
+`epoch_e03.pt`, `epoch_e04.pt`, `epoch_e05.pt`, `epoch_e06.pt`
+and `state_eXX.pt` (optimizer/scheduler/Python+Torch RNG/actual shuffled row
+order to allow exact epoch-boundary resume). Output in
+`dpo/experiments/round9_random_multi_e3_e6/`. An append-only
+`train_progress.json` records each finished epoch and SHA256;
+`train_manifest.json` appears only after *all* four epochs finish.
+No old checkpoint or evaluation is overwritten.
+
+Commands, from TC1 repository root on branch `round9-balanced-self-hardneg`:
+
+    git status --short
+    git pull --ff-only origin round9-balanced-self-hardneg
+    source .venv/bin/activate
+    python scripts/train_round9_random_multi.py --check-only
+    # optional short smoke (separate directory; limited 128 rows, 2 epochs):
+    sbatch scripts/round9_random_multi_train.sbatch --smoke
+    # after smoke job has finished and no GPU job is active:
+    sbatch scripts/round9_random_multi_train.sbatch
+    # if a job is stopped after one or more complete epochs:
+    sbatch scripts/round9_random_multi_train.sbatch --resume
+
+When `MULTI TRAIN PASS` appears, run CPU verification and submit ONE
+GPU evaluation job to **evaluate all four saved epoch checkpoints afterward**:
+
+    python scripts/eval_round9_random_multi.py --check-only
+    sbatch scripts/round9_random_multi_eval.sbatch
+
+The evaluation job uses the same frozen TrainProbe256, Val768, OldOOD256,
+Extended384 and Teacher680 as before, greedy/strict answer-first, 80 tokens.
+Direct128 is an exact subgroup of Extended384, scored without re-inference.
+Each epoch's predictions/summaries are saved immediately under
+`round9_random_multi_e3_e6/eval/e03/` etc.; another invocation safely
+skips completed epochs/splits. Full E2-vs-E3..E6 paired comparisons and
+per-category scores are saved to
+`round9_random_multi_e3_e6/eval/all_epochs_comparison.json`.
+The sealed Round3 final Test is never accessed. **No accuracy claims until
+training and evaluation have been run on TC1.**
+
+Job monitoring (substitute the actual printed job ID):
+
+    squeue -u "$USER"
+    tail -n 30 -f round9_random_multi_train_<jobid>.out
+    tail -n 30 -f round9_random_multi_eval_<jobid>.out
+
+A longer run should not be justified solely by validation-set tuning:
+avoid selecting epochs using the sealed Test, and report potential
+validation selection bias if choosing the best among several snapshots.
