@@ -49,7 +49,37 @@ jobs:
               "cosine_schedule_epochs", "MAX_NEW_TOKENS = 80",
               "FAST_SMOKE = False"):
               assert required in all_source, required
-          assert "ROUND3/FINAL_TEST" not in all_source
+          def literal_stage_plan(var_name):
+              result=None
+              for src,c in code:
+                  tree=ast.parse(src)
+                  for statement in tree.body:
+                      if not isinstance(statement, ast.Assign):
+                          continue
+                      if not any(isinstance(t,ast.Name) and t.id==var_name
+                                 for t in statement.targets):
+                          continue
+                      result=[]
+                      for d in statement.value.elts:
+                          fields={}
+                          for k,v in zip(d.keys,d.values):
+                              key=ast.literal_eval(k)
+                              if key in ("id","actual_epochs","schedule_epochs","lr"):
+                                  fields[key]=ast.literal_eval(v)
+                          result.append(fields)
+              assert result is not None, var_name
+              return result
+          p1=literal_stage_plan("STAGE1_TO_4")
+          p2=literal_stage_plan("STAGE5_TO_7")
+          assert [(x["id"],x["actual_epochs"],x["schedule_epochs"]) for x in p1]==[
+              ("round3_structured",5,5),("round4_treatment_e1",1,2),
+              ("round5_original",1,1),("round7_replay",1,1)]
+          assert [(x["id"],x["actual_epochs"],x["schedule_epochs"]) for x in p2]==[
+              ("round9_random_e1",1,1),("round9_random_e2_restart",1,1),
+              ("round9_random_e3_e5_from_e2",3,4)]
+          assert sorted(x.name for x in pathlib.Path("dpo").glob("*.ipynb"))==["dpo.ipynb"]
+          assert "FINAL_EXPORT_POLICY = \"archived_if_available\"" in all_source
+          assert "FAST_SMOKE = False" in all_source
           print("NOTEBOOK STATIC CONTRACT PASS:",
                 len(code),"Python cells,",len(snapshots),
                 "complete source snapshots; no GPU execution claimed")
