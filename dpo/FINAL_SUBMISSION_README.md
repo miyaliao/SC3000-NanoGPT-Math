@@ -1,52 +1,68 @@
-# SC3000 Final Notebook — original teacher Steps 1–8
+# SC3000 DPO — Final notebook submission
 
-The submission notebook is `dpo/dpo.ipynb` on branch
-`sc3000-final-reproducible-notebook`. It was rebuilt from the
-unmodified 16-cell instructor reference, preserved as
-`dpo/reference_course_notebook_v1.json`.
+**Notebook:** `dpo/dpo.ipynb`. The instructor's original **Step 1–8** headings,
+core `compute_logprob` and `get_batches`, SFT model load, Step 5 data
+validation, Step 6 optimizer configuration and **unchanged Step 8 test_set**
+are retained. Only the original training and inference placeholders are
+completed/extended.
 
-## Original code preserved
+## Run All modes
 
-The original Step 2 configuration, Step 3 helper functions,
-Step 4 model load, Step 5 preference loading, and Step 6 AdamW/cosine
-configuration remain as original code cells, in order.
-The original Step 7 single-stage loop is kept beneath an explicit
-`RUN_SINGLE_STAGE_DEMO=False` guard so Run All does not accidentally
-train an extra five epochs or overwrite `dpo/dpo.pt`. The original
-Step 8 `test_set`, including its duplicate test questions, is unchanged;
-only the instructor's inference/printing placeholder is filled.
+- `TRAINING_POLICY="auto"` (default): choose exact **historical Random E5**
+  replay when all five frozen training sources (Round3/Round4/Round5/Round7/
+  Round9) are present and Random100k matches its known SHA256. In this path,
+  train from SFT using the original preference loss, 13 epochs across seven
+  stages with optimizer/scheduler restarts and per-epoch checkpoint/optimizer/
+  RNG snapshots. E5's historical training weights are selected if available
+  and a parity comparison with the newly replayed E5 is recorded.
+- Otherwise automatically choose **course mode**, using the mandatory
+  `dpo/pos_neg_pairs.json`. When it contains 100,000 rows, use it unchanged.
+  If absent/too small, a self-contained verified 12-category arithmetic
+  generator in **Step 5** creates 100,000 seeded preference pairs. The original
+  Step 7 loop then runs five epochs from SFT, saving `dpo/dpo.pt`.
+  This is a runnable course baseline, **not** an exact E5 reproduction.
+- `FAST_SMOKE=True`: 128 examples / one epoch, save to a separate smoke
+  checkpoint without overwriting `dpo/dpo.pt`. Set it back to `False`
+  before final execution.
 
-The extra E5 training logic is appended under Step 7 and the supplementary
-development evaluation under Step 8. Only E5-required data generator
-entrypoints and integrity checks are displayed under Step 5, not 12
-embedded source-script copies. The actual generator implementations remain
-in `scripts/` and must be included with submission data if required by
-the assignment package. All eight instructor Step headings remain in order.
+## Required artifact files
 
-## Historical E5 model chain
+The grading ZIP must include, at minimum:
 
-SFT → Round3 structured (5 epochs) → Round4 Treatment E1 (one
-epoch of two-epoch cosine schedule) → Round5 Original (1 epoch) →
-Round7 Replay (1 epoch) → Round9 Random E1 (1 epoch) → Random E2
-(1 epoch with fresh AdamW) → Random E3–E5 (three epochs within a
-four-epoch continuous cosine schedule).
+- `dpo/dpo.pt` — fine-tuned checkpoint
+- `dpo/dpo.ipynb` — saved after running from top to bottom, including actual
+  data summary, training logs and original Step 8 model outputs
+- `dpo/pos_neg_pairs.json` — **100,000** positive/negative rows loaded
+  by the instructor's original Step 5
 
-Total: 13 training epochs, 20,306 optimizer steps across the seven
-stages with 100,000 rows, batch64 and original full-sequence Course
-Preference Loss. Each completed epoch saves model, optimizer,
-scheduler and RNG states. The original Round3 final Test is not read.
+The TA should also have the **course-provided input model and tokenizer**
+(`sft/gpt.pt`, `sft/meta.pkl`, `model.py`) for a fresh training run.
+For **exact** seven-stage E5 replay, all frozen historical stage data and
+associated generator code must also be available; the final Random100k
+JSON alone cannot recreate the previous curriculum stages. Additional data
+files may require a separate delivery method if the submission ZIP or email
+attachment becomes too large.
 
-## Running
+## Evaluation and writing
 
-On TC1, use its NanoGPT-Math `.venv` Jupyter kernel; set
-`FAST_SMOKE=True` for a tiny pipeline test that **never exports formal
-dpo.pt**, and then `False` for full Run All. Completed epochs resume.
-The historical selected E5 is kept as the submission checkpoint when
-available; independently replayed weights are compared with that
-checkpoint, and any numerical discrepancies are disclosed.
+Step 8 prints the **original eight instructor prompts** including repeated
+prompts. It also calculates real numeric-answer development results when
+the frozen Val768 and Seen-heavy Teacher680 datasets exist. No private TA
+test is used for model selection. The notebook includes analysis of why E5
+was preferred over later control and carry-focused experiments, notes on
+repeated mathematical facts, and source attribution for the course-provided
+scaffold and external libraries. Complete the contributor/name placeholder
+with accurate team information.
 
-The GitHub workflow validates Python syntax, the instructor's eight
-headings, original core helper/model/data/optimizer cells and unchanged
-teacher Step 8 question list. **No GPU execution is claimed.** Before
-submission, rerun the notebook in TC1, save all actual outputs in the
-ipynb, verify `dpo/dpo.pt` and include necessary data/generator files.
+## Verification
+
+GitHub Actions checks all notebook Python cells, exact original Step 1–8
+headings/test prompts, a deterministic data synthesis generator, and a
+disposable **CPU end-to-end smoke** on the original 8.84M GPT architecture.
+This CI smoke does **not** assert numerical reproducibility of the trained
+historical E5. Run the saved notebook on TC1's prepared CUDA kernel before
+submitting, keeping all outputs visible when the file is opened without execution.
+
+The original course notebook is preserved as
+`dpo/reference_course_notebook_v1.json`. Other historical training
+scripts are unaffected.
