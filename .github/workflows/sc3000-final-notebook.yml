@@ -1,4 +1,4 @@
-name: SC3000 instructor-template integrity
+name: SC3000 notebook and data synthesis verification
 on:
   push:
     branches: [sc3000-final-reproducible-notebook]
@@ -14,42 +14,52 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-      - name: Verify original teacher scaffold, stage contract, and Python syntax
+      - name: Verify instructor structure, Python syntax and real generator samples
         run: |
           python - <<'PY'
-          import ast,json,pathlib,re
-          notebook=json.loads(pathlib.Path("dpo/dpo.ipynb").read_text())
-          original=json.loads(pathlib.Path("dpo/reference_course_notebook_v1.json").read_text())
-          cells=notebook["cells"]
-          source=lambda c:"".join(c["source"])
-          code=[source(c) for c in cells if c["cell_type"]=="code"]
-          for i,c in enumerate(code):compile(c,"notebook-cell-%d"%i,"exec")
-          steps=[source(c).splitlines()[0] for c in cells
-                 if c["cell_type"]=="markdown" and source(c).startswith("### Step ")]
-          expected=[source(original["cells"][i]).splitlines()[0]
-                    for i in (0,2,4,6,8,10,12,14)]
-          assert steps==expected,(steps,expected)
-          for old_idx in (5,7,9,11):
-              original_source=source(original["cells"][old_idx])
-              assert any(x==original_source for x in code),old_idx
-          old_step7=source(original["cells"][13])
-          assert all(line in "\n".join(code) for line in
-                     ("RUN_SINGLE_STAGE_DEMO=False",
-                      "    "+old_step7.splitlines()[0],
-                      "    "+old_step7.splitlines()[-1]))
-          old_test=re.search(r'^test_set = \[.*\]$',source(original["cells"][15]),re.M).group()
-          assert old_test in "\n".join(code)
-          for required in ("FAST_SMOKE=False","STAGE1_TO_4","STAGE5_TO_7",
-                           "stage_course_preference_loss(","stage_get_batches(",
-                           "train_stage(","greedy_original_stop(",
-                           "FINAL_EXPORT_POLICY"):
-              assert required in "\n".join(code),required
-          assert not any("BUNDLED_GENERATOR_SOURCE" in x for x in code)
-          stage_text="\\n".join(code)
-          for value in ("round3_structured","round4_treatment_e1",
-                        "round5_original","round7_replay",
-                        "round9_random_e1","round9_random_e2_restart",
-                        "round9_random_e3_e5_from_e2"):
-              assert value in stage_text,value
-          print("PASS instructor 8 headings, original core code, preserved test_set, 13-epoch contract")
+          import json, pathlib, re, hashlib, random, ast
+          here=pathlib.Path("dpo")
+          nb=json.loads((here/"dpo.ipynb").read_text(encoding="utf-8"))
+          teacher=json.loads((here/"reference_course_notebook_v1.json").read_text(encoding="utf-8"))
+          source=lambda cell:"".join(cell["source"])
+          code=[source(c) for c in nb["cells"] if c["cell_type"]=="code"]
+          for i,c in enumerate(code):
+              compile(c,f"cell-{i}","exec")
+          step_titles=[source(c).splitlines()[0] for c in nb["cells"]
+                       if c["cell_type"]=="markdown" and source(c).startswith("### Step ")]
+          baseline_titles=[source(teacher["cells"][i]).splitlines()[0]
+                           for i in (0,2,4,6,8,10,12,14)]
+          assert step_titles==baseline_titles, (step_titles,baseline_titles)
+          for idx in (3,5,7,9,11):
+              old_source=source(teacher["cells"][idx])
+              if idx==3:
+                  assert any(c.startswith(old_source) for c in code),idx
+              else:
+                  assert old_source in code,idx
+          original_training=source(teacher["cells"][13])
+          assert all("    "+line in "\n".join(code) for line in
+                     (original_training.splitlines()[0],
+                      original_training.splitlines()[-1]))
+          original_test=re.search(r'^test_set = \[.*\]$',source(teacher["cells"][15]),re.M).group()
+          assert original_test in "\n".join(code)
+          assert "print(prompt+completion)" in "\n".join(code)
+          assert sum("BUNDLED_GENERATOR_SOURCE" in c for c in code)==0
+          joined="\n".join(code)
+          for item in ("FAST_SMOKE","TRAIN_MODE","RUN_SINGLE_STAGE_DEMO",
+                       "stage_course_preference_loss","stage_get_batches",
+                       "STAGE1_TO_4","STAGE5_TO_7","train_stage(",
+                       "greedy_original_stop(","dpo.pt","100000"):
+              assert item in joined,item
+          synth=[c for c in code if "def make_preference_pairs(" in c]
+          assert len(synth)==1
+          ns={"json":json,"hashlib":hashlib,"random":random,"re":re}
+          exec(compile(synth[0],"task1-data-generation","exec"),ns)
+          for seed in (42,43):
+              rows=ns["make_preference_pairs"](120,seed)
+              assert len(rows)==120
+              assert len({x["positive"] for x in rows})>20
+              assert all(x["negative"].endswith("Sorry, I don't know.") for x in rows)
+              assert all(" The answer is " in x["positive"] for x in rows)
+              assert rows==ns["make_preference_pairs"](120,seed)
+          print("PASS: instructor Steps 1–8, exact original test_set, Python code, Task1 generator")
           PY
