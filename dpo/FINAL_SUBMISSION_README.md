@@ -1,6 +1,10 @@
-# SC3000 Final Submission Notebook — Run All reproduction
+# SC3000 Final Submission Notebook — Instructor Step 1–8 framework
 
 **File:** `dpo/dpo.ipynb` on branch `sc3000-final-reproducible-notebook`.
+
+**Structure:** The original instructor `Step 1: Install necesscary packages` → `Step 2: Package imports and configuration` → `Step 3: Define helper functions` → `Step 4: Load the pretrained NanoGPT model` → `Step 5: Load Data` → `Step 6: Build the optimizer and scheduler` → `Step 7: Begin training` → `Step 8: Begin testing` is restored **in the exact original order**. Multi-stage training is implemented as sub-sections of Step 7, data-generation source as collapsed cells of Step 5, and post-hoc audit under Step 8. The original Course Loss is used throughout.
+
+The final Notebook contains **no Task 1/2/3/4 top-level sections** and no separate grading artifact; the structure follows the teacher's original teaching steps.
 
 ## What the notebook actually reproduces
 
