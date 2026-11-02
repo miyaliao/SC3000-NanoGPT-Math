@@ -120,7 +120,10 @@ def select_targeted(old_records,protected,replay_protected):
     rng=random.Random(SEED)
     additive={}
     for rec in old_records:
-        if rec["category"] in ADD:additive.setdefault(rec["prompt"],rec)
+        if (rec["category"] in ADD and
+            tuple(rec["fact"]) not in replay_protected and
+            stable_split(rec["fact"],42)=="train"):
+            additive.setdefault(rec["prompt"],rec)
     selected_add=rng.sample(list(additive.values()),min(8000,len(additive)))
     if len(selected_add)<8000:
         # Even replay must have a strict cap: do not silently fill 8k with one fact.
