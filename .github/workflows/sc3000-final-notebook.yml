@@ -100,7 +100,7 @@ jobs:
               if c["cell_type"]!="code":continue
               s="".join(c["source"])
               s=s.replace("FAST_SMOKE = False","FAST_SMOKE = True")
-              s=s.replace('TRAINING_POLICY = "auto"', 'TRAINING_POLICY = "course"')
+              s=s.replace('TRAINING_POLICY = "historical"', 'TRAINING_POLICY = "course"')
               s=s.replace("MAX_NEW_TOKENS = 80","MAX_NEW_TOKENS = 12")
               print("EXECUTE CELL",index,s[:60].replace("\n"," "),flush=True)
               exec(compile(s,f"notebook-cell-{index}","exec"),namespace)
