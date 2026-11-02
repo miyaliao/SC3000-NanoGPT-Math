@@ -156,38 +156,111 @@ def select_targeted(old_records,protected,teacher):
     details=Counter()
     for bucket in ("1digit","2digit","3digit"):
         quotas=QUOTA[bucket]
-        # Round-robin task families prevents one category from taking every shared fact.
-        remaining=dict(quotas)
-        carry_target={cat:int(q*0.35) for cat,q in quotas.items()} if bucket=="2digit" else {}
-        carry_used=Counter()
+        total_quota=sum(quotas.values())
         pcap={"1digit":15,"2digit":10,"3digit":3}[bucket]
         fcap={"1digit":100,"2digit":70,"3digit":20}[bucket]
-        for cat in MULT:
-            if not grouped[(bucket,cat,"carry")] and not grouped[(bucket,cat,"nocarry")]:
-                raise RuntimeError(f"No eligible items for {bucket}/{cat}")
-        while any(remaining.values()):
-            for cat in MULT:
-                if remaining[cat]<=0:continue
-                if bucket=="2digit" and carry_used[cat]<carry_target[cat]:
-                    key=(bucket,cat,"carry")
-                else:key=(bucket,cat,"nocarry")
-                pool=grouped[key]
+        remaining=dict(quotas)
+        by_stratum=Counter()
+        bucket_rows=[]
+
+        # Quotas for category and carry are desired exposure targets, not an
+        # excuse to violate the hard prompt/fact caps. If one category is
+        # capacity limited, we reallocate its deficit WITHIN the same product
+        # difficulty bucket and disclose actual counts in the manifest.
+        def take(cat,strata):
+            for stratum in strata:
+                pool=grouped[(bucket,cat,stratum)]
+                if not pool:continue
                 try:
                     rec=roll(pool,rng,counts,fact_counts,pcap,fcap)
-                except RuntimeError:
-                    # Prefer a legal alternative only when the preferred stratum is exhausted.
-                    other="nocarry" if key[-1]=="carry" else "carry"
-                    rec=roll(grouped[(bucket,cat,other)],rng,counts,fact_counts,pcap,fcap)
+                except RuntimeError as err:
+                    if "Strict caps exhaust quota" not in str(err):
+                        raise
+                    continue
                 targeted.append(rec)
-                remaining[cat]-=1
-                if rec["carry"]:carry_used[cat]+=1
+                bucket_rows.append(rec)
                 details[(bucket,cat)]+=1
+                by_stratum[stratum]+=1
+                return True
+            return False
+
+        # In the two-digit bucket, prioritize true ones-column carry before
+        # consuming shared canonical fact capacity on noncarry examples.
         if bucket=="2digit":
-            n=sum(details[("2digit",cat)] for cat in MULT)
-            c=sum(1 for rec in targeted[8000:] if rec["bin"]=="2digit" and rec["carry"])
+            carry_targets={cat:int(quotas[cat]*0.35) for cat in MULT}
+            carry_used=Counter()
+            for cat in MULT:
+                while carry_used[cat]<carry_targets[cat]:
+                    if not take(cat,("carry",)):break
+                    carry_used[cat]+=1
+                    remaining[cat]-=1
+            print(f"BIN {bucket}: first-pass carry={sum(carry_used.values())}/"
+                  f"{sum(carry_targets.values())}",flush=True)
+
+        # Respect per-category quotas whenever possible; alternate categories
+        # so one task cannot consume all the shared fact capacity first.
+        while any(remaining.values()):
+            made_progress=False
+            for cat in MULT:
+                if remaining[cat]<=0:continue
+                prefer=("nocarry","carry") if bucket=="2digit" else ("nocarry",)
+                if take(cat,prefer):
+                    remaining[cat]-=1
+                    made_progress=True
+            if not made_progress:break
+
+        shortage=sum(remaining.values())
+        if shortage:
+            print(f"BIN {bucket}: category-quota shortage={shortage} "
+                  f"by_category={dict((k,v) for k,v in remaining.items() if v)}; "
+                  f"redistributing within same difficulty",flush=True)
+        # Fill the category deficits with OTHER task families that can legally
+        # accept the same product difficulty under exactly the same caps.
+        while len(bucket_rows)<total_quota:
+            made_progress=False
+            order=sorted(MULT,key=lambda cat:(details[(bucket,cat)]-quotas[cat],cat))
+            for cat in order:
+                if len(bucket_rows)>=total_quota:break
+                prefer=("carry","nocarry") if bucket=="2digit" else ("nocarry",)
+                if take(cat,prefer):
+                    made_progress=True
+            if not made_progress:
+                facts=defaultdict(list)
+                for cat in MULT:
+                    for stratum in ("carry","nocarry"):
+                        for item in grouped[(bucket,cat,stratum)]:
+                            facts[tuple(item["fact"])].append(item["prompt"])
+                bound=sum(min(fcap,len(set(prompts))*pcap) for prompts in facts.values())
+                print(f"BIN {bucket} CAPACITY DIAGNOSTIC: "
+                      f"required={total_quota} achieved={len(bucket_rows)} "
+                      f"unique_candidate_facts={len(facts)} "
+                      f"upper_bound_exposures={bound} "
+                      f"hard_prompt_cap={pcap} hard_fact_cap={fcap}",flush=True)
+                for cat in MULT:
+                    possible=sum(
+                        counts[item["prompt"]]<pcap and
+                        fact_counts[tuple(item["fact"])]<fcap
+                        for sub in ("carry","nocarry")
+                        for item in grouped[(bucket,cat,sub)]
+                    )
+                    print(f"  {cat:12}: selected={details[(bucket,cat)]} "
+                          f"desired={quotas[cat]} available_prompts={possible}",flush=True)
+                raise RuntimeError(
+                    f"INFEASIBLE {bucket}: {len(bucket_rows)}/{total_quota}; "
+                    f"do not relax no-repeat caps or change numerical quotas silently")
+        if len(bucket_rows)!=total_quota:
+            raise RuntimeError(f"Wrong {bucket} total")
+        if bucket=="2digit":
+            n=len(bucket_rows)
+            c=sum(x["carry"] for x in bucket_rows)
             if c<0.30*n:
-                raise RuntimeError(f"Carry exposure unexpectedly low: {c}/{n}")
-            print(f"2DIGIT carry exposure={c}/{n} ({c/n:.2%}); target >=30%",flush=True)
+                raise RuntimeError(
+                    f"Carry exposure {c}/{n} below precommitted 30% minimum; "
+                    f"do not mask this as successful generation")
+            print(f"2DIGIT carry exposure={c}/{n} ({c/n:.2%}); >=30% PASS",flush=True)
+        print(f"BIN {bucket} PASS rows={len(bucket_rows)} "
+              f"actual_categories={dict((cat,details[(bucket,cat)]) for cat in MULT)}",
+              flush=True)
     assert len(targeted)==20000
     # Additive 8000 are all unique, multiplicative identities can recur at capped exposure.
     rng.shuffle(targeted)
