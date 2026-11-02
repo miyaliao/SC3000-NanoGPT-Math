@@ -292,3 +292,38 @@ Re-run (CPU only):
 **Do not run `--build` until `ROUND10 AUDIT PASS`**. If infeasible, inspect
 printed `BIN ... CAPACITY DIAGNOSTIC`; reduce requested exposures or adjust
 caps only after a documented research decision, never silently.
+
+## Round10 constructed audit results (2026-11-02)
+
+Actual `--verify-only` and `--build` have PASSED on TC1; frozen parent
+E5 SHA256 `0247fc4a...` and Random100k SHA256 `30519fe6...`
+recorded in the dataset manifest. Targeted counts exactly match 8,000
+additive + 670 product<10 + 6,720 product10..99 + 4,610 product100..999.
+The 2-digit-product ones-carry subgroup is 2,292/6,720 (34.11%; predeclared
+minimum 30% met), across all six multiplication/division task forms.
+The multiplicative part has 5,508 distinct surface prompts and 1,275
+canonical facts; max exposure per prompt 15, max per fact 100 (for tiny
+product<10 facts). **This is emphatically NOT unique-fact-only.**
+A total of 7,509 targeted multiplicative rows replay historical Seen
+Teacher680 facts; the frozen Teacher680 benchmark is NOT independent OOD.
+
+The new `basic_probe.json` was empty (`basic_probe_n=0`) because the
+new probe generator required a math fact to be both original VAL-split
+and excluded from all old fixed validation protections. Do not represent
+this as a new independent elementary test; it does not exist. The
+evaluator has been extended to report product10..99,
+direct-multiply10..99, and ones-carry10..99 **subgroups of the
+EXISTING frozen Val768**, using saved Val768 model predictions without
+another inference, plus the five already-reserved fixed probes.
+These basic subgroups count as Val768, NOT independent test data. No
+dataset rebuild is needed for this evaluation-script change.
+
+Next CPU-only commands (since the dataset already EXISTS, do not rerun
+`--build`):
+
+    git pull --ff-only origin round9-balanced-self-hardneg
+    python scripts/train_round10_elementary.py --arm control --device cpu --check-only
+    python scripts/train_round10_elementary.py --arm targeted --device cpu --check-only
+
+If these pass, run Control smoke, then Targeted smoke, then full
+training one job at a time, then the joint evaluation per above.
