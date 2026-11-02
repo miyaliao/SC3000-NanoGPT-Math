@@ -145,10 +145,19 @@ def main():
         out.mkdir(parents=True,exist_ok=False)
         finished=0
         write_once(out/"config.json",config)
+    # A verified symlink avoids a second large JSON serialization and prevents
+    # accidentally truncated copies from being loaded by Notebook Step 5.
+    source_pairs=(DATA/"random_pairs.json").resolve()
+    expected_pairs_sha=config["dataset_sha256"]
     if not args.resume:
-        write_once(out/"pos_neg_pairs.json",pairs)
-    elif sha(out/"pos_neg_pairs.json")!=progress["train_copy_sha256"]:
+        link=out/"pos_neg_pairs.json"
+        link.symlink_to(source_pairs)
+    if not (out/"pos_neg_pairs.json").is_file() or sha(out/"pos_neg_pairs.json")!=expected_pairs_sha:
+        raise RuntimeError("Notebook training data link differs from verified Random pairs")
+    if args.resume and sha(out/"pos_neg_pairs.json")!=progress["train_copy_sha256"]:
         raise RuntimeError("Saved Random pairs changed during resume")
+    print(f"TRAIN DATA VERIFIED sha={expected_pairs_sha[:16]} "
+          f"path={(out/'pos_neg_pairs.json').resolve()}",flush=True)
     env["dpo_dir"]=out
     execute_step(5,cells,env)
     if len(env["lines"])!=len(pairs) or env["data_path"].resolve()!=(out/"pos_neg_pairs.json").resolve():
