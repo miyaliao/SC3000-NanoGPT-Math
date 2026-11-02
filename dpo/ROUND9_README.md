@@ -261,3 +261,34 @@ with per-split paired E5-vs-Control, E5-vs-Targeted and Control-vs-Targeted
 results plus Val768 per-category direct multiply/divide/x_over_a.
 Claim improvement ONLY after training and evaluating on TC1; no
 evaluation outcomes are embedded in the generator.
+
+### Round10 verify-only capacity fix (2026-11-02)
+
+Initial `--verify-only` failed with `Strict caps exhaust quota` and an empty
+fallback pool. The first generator mistakenly excluded **all** Teacher680
+facts from the elementary training candidate pool. Teacher680 is a
+HISTORICAL-SEEN-Facts retention benchmark, not unseen generalization: frozen
+Core400+Extension280 includes nine of the eleven positive 1-digit product
+canonical facts in the TRAIN split; a further fact is RESERVED. The eligible
+1-digit pool therefore collapsed. The updated builder:
+
+- Only admits teacher-fact rows **already present in original Random
+  TRAIN**, never generates NEW examples from teacher-fact pool.
+- Still excludes frozen Val/OOD/Extended, public and RESERVED facts, including
+  `3*17=?`, and still requires `stable_split(fact,42)==train`.
+- Uses capacity-aware **within-bin** category reallocation instead of
+  failing on an empty alternative stratum, while never relaxing per-prompt
+  or canonical-fact repetition caps. Prints actual counts per category.
+- Prints `BIN CAPACITY` diagnostics and fails loudly if any entire
+  difficulty bucket cannot attain its assigned exposure count or the
+  two-digit product carry exposure is below 30%. Avoids zero-product
+  examples in the new multiplicative curriculum.
+
+Re-run (CPU only):
+
+    git pull --ff-only origin round9-balanced-self-hardneg
+    python scripts/build_round10_elementary.py --verify-only
+
+**Do not run `--build` until `ROUND10 AUDIT PASS`**. If infeasible, inspect
+printed `BIN ... CAPACITY DIAGNOSTIC`; reduce requested exposures or adjust
+caps only after a documented research decision, never silently.
