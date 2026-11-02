@@ -149,8 +149,8 @@ def select_targeted(old_records,protected,replay_protected):
     replayed_teacher=0
     for rec in old_records:
         key=tuple(rec["fact"])
-        if rec["category"] in MULT and key not in replay_protected and \
-           stable_split(key,42)=="train":
+        if rec["category"] in MULT and int(key[3])>0 and \
+           key not in replay_protected and stable_split(key,42)=="train":
             if rec["prompt"] not in pools and key in protected:
                 replayed_teacher+=1
             pools.setdefault(rec["prompt"],rec)
@@ -162,6 +162,17 @@ def select_targeted(old_records,protected,replay_protected):
         if rec["category"] in MULT and rec["bin"] in QUOTA:
             key=(rec["bin"],rec["category"], "carry" if rec["carry"] else "nocarry")
             grouped[key].append(rec)
+    for bucket in ("1digit","2digit","3digit"):
+        candidates=[rec for cat in MULT for sub in ("carry","nocarry")
+                    for rec in grouped[(bucket,cat,sub)]]
+        unique_facts={tuple(rec["fact"]) for rec in candidates}
+        ncarry=len({tuple(rec["fact"]) for rec in candidates if rec["carry"]})
+        print(f"BIN CAPACITY {bucket}: candidate_prompts={len(candidates)} "
+              f"unique_facts={len(unique_facts)} carry_facts={ncarry} "
+              f"target_rows={sum(QUOTA[bucket].values())}",flush=True)
+        for cat in MULT:
+            n=sum(len(grouped[(bucket,cat,sub)]) for sub in ("carry","nocarry"))
+            print(f"  POOL {bucket}/{cat}: unique_prompts={n}",flush=True)
     counts=Counter()
     fact_counts=Counter()
     targeted=list(selected_add)
