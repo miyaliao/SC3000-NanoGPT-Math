@@ -28,7 +28,12 @@ from fractions import Fraction
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-NOTEBOOK = ROOT / "dpo" / "dpo.ipynb"
+# The final submission notebook is a multi-stage self-contained trainer.
+# Earlier experiment scripts still need original course Step2–8 cells;
+# keep their reference frozen under a .json filename (only one .ipynb
+# exists for the final submission). This fallback preserves old checkout use.
+COURSE_REFERENCE = ROOT / "dpo" / "reference_course_notebook_v1.json"
+NOTEBOOK = COURSE_REFERENCE if COURSE_REFERENCE.is_file() else ROOT / "dpo" / "dpo.ipynb"
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from math_eval_utils import greedy_completion, grade_completion, parse_expected, self_test as test_eval  # noqa: E402
 
