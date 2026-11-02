@@ -1,0 +1,56 @@
+name: SC3000 final notebook contract
+on:
+  push:
+    branches: [sc3000-final-reproducible-notebook]
+    paths:
+      - 'dpo/dpo.ipynb'
+      - '.github/workflows/sc3000-final-notebook.yml'
+  pull_request:
+    paths:
+      - 'dpo/dpo.ipynb'
+      - '.github/workflows/sc3000-final-notebook.yml'
+jobs:
+  validate-notebook:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Validate notebook format, cell syntax, frozen generator sources and stage contract
+        run: |
+          python - <<'PY'
+          import ast, json, pathlib
+          nb_path=pathlib.Path("dpo/dpo.ipynb")
+          nb=json.loads(nb_path.read_text(encoding="utf-8"))
+          assert nb["nbformat"]==4 and nb["nbformat_minor"]>=5
+          cells=nb["cells"]
+          code=[("".join(c["source"]),c) for c in cells if c["cell_type"]=="code"]
+          assert len(code)>=10
+          for i,(src,c) in enumerate(code):
+              compile(src, f"{nb_path}:code-cell:{i}", "exec")
+              assert isinstance(c["outputs"],list) and c["execution_count"] is None
+          snapshots={}
+          for src,c in code:
+              if 'BUNDLED_GENERATOR_SOURCE = {}' in src:
+                  snapshots={}
+              elif c.get("metadata",{}).get("tags")==["embedded-data-generator","task-1"]:
+                  exec(compile(src,"embedded-generator","exec"),{"BUNDLED_GENERATOR_SOURCE":snapshots})
+          assert len(snapshots)>=12
+          for path,source in snapshots.items():
+              assert pathlib.Path(path).read_text(encoding="utf-8")==source, path
+              compile(source,path,"exec")
+          all_source="\n".join(src for src,c in code)
+          for required in (
+              "round3_structured", "round4_treatment_e1", "round5_original",
+              "round7_replay", "round9_random_e1", "round9_random_e2_restart",
+              "round9_random_e3_e5_from_e2", "course_preference_loss",
+              "train_stage(", "greedy_original_stop(", "save_json_once(",
+              "cosine_schedule_epochs", "MAX_NEW_TOKENS = 80",
+              "FAST_SMOKE = False"):
+              assert required in all_source, required
+          assert "ROUND3/FINAL_TEST" not in all_source
+          print("NOTEBOOK STATIC CONTRACT PASS:",
+                len(code),"Python cells,",len(snapshots),
+                "complete source snapshots; no GPU execution claimed")
+          PY
